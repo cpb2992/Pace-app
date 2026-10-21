@@ -8,6 +8,7 @@ name: Build Android app
 on:
   push:
     branches: [main]
+    paths-ignore: ['**.md', 'LICENSE', '.env.example']
   workflow_dispatch:
 
 permissions:
@@ -47,6 +48,10 @@ jobs:
 
       - name: Build the app
         working-directory: android
+        # Optional: add these as repository secrets to turn on the AI coach and WHOOP live sync.
+        env:
+          EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.EXPO_PUBLIC_SUPABASE_URL }}
+          EXPO_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.EXPO_PUBLIC_SUPABASE_ANON_KEY }}
         run: ./gradlew assembleRelease --no-daemon -PreactNativeArchitectures=arm64-v8a
 
       - name: Name the file

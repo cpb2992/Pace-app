@@ -35,6 +35,17 @@ npm run typecheck    # TypeScript
 npx expo lint        # lint
 ```
 
+### Or install it on an Android phone with no computer
+
+Every push to `main` builds `Pace.apk` with GitHub Actions and posts it on the repo's **Releases** page.
+
+1. On the phone, open the repo's Releases page and tap **Pace.apk** under the newest build.
+2. Open the download. If Android asks, allow your browser to install unknown apps.
+3. If Play Protect warns about an unknown developer, tap **More details → Install anyway**. On Samsung phones, if Auto Blocker stops the install, turn it off in Settings → Security and privacy → Auto Blocker, install, then turn it back on.
+4. To update, install the newest build over the old one. Your data stays on the phone.
+
+This build is signed with a debug key: fine for your own phone, not for the Play Store (that's step 3).
+
 ## 2. Turn on the AI coach and WHOOP live sync (backend)
 
 The backend lives in `supabase/`: two Edge Functions and one database migration.
@@ -56,7 +67,7 @@ The backend lives in `supabase/`: two Edge Functions and one database migration.
    supabase functions deploy coach
    supabase functions deploy whoop --no-verify-jwt
    ```
-5. Copy `.env.example` to `.env` and fill in your project URL and anon key. Restart `npx expo start`.
+5. Copy `.env.example` to `.env` and fill in your project URL and anon key. Restart `npx expo start`. For the GitHub-built APK, add the same two values as repository secrets (`EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_ANON_KEY`) and re-run the build.
 
 **WHOOP developer setup:** at [developer.whoop.com](https://developer.whoop.com), sign in with your WHOOP account and create an app. Add the redirect URL from step 3 and request the scopes `read:recovery read:sleep read:cycles offline`. Submit the app for WHOOP's approval before launch. WHOOP's default limit is 100 requests a minute and 10,000 a day per app.
 
