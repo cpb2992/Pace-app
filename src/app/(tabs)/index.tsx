@@ -7,7 +7,7 @@ import { evidence, FIX, rxText, VOICE, ZONES } from '../../engine/training';
 import { fmtW, letter, num } from '../../engine/util';
 import { askCoach, backendReady } from '../../services/backend';
 import { useApp, useDayIdx } from '../../store/AppStore';
-import { Badge, Button, Card, Chip, Divider, Field, Logo, Ring, Row, Screen, Segmented, Tag, Txt } from '../../ui/components';
+import { Badge, Button, Card, Chip, Divider, Field, Logo, Ring, Row, Screen, Segmented, Tag, TwoCol, Txt } from '../../ui/components';
 import { useTheme } from '../../ui/theme';
 
 function CheckIn({ onDone, canCancel }: { onDone: () => void; canCancel: boolean }) {
@@ -175,11 +175,17 @@ export default function Today() {
   return (
     <Screen title="Today" sub={fmtLong(today)} eyebrow={<Row gap={6} style={{ justifyContent: 'flex-start' }}><Logo size={16} color={t.accent} /><Txt v="label" color={t.ink2} style={{ fontWeight: '600' }}>Pace</Txt></Row>}>
       {demo ? <Card style={{ backgroundColor: t.holdSoft, borderColor: t.holdSoft }}><Row><Txt v="body" color={t.hold} style={{ fontWeight: '500' }}>Viewing demo data</Txt><Button small title="Exit demo" onPress={endDemo} /></Row></Card> : null}
-      {r.zone === 'unknown' || editing ? <CheckIn onDone={() => setEditing(false)} canCancel={r.zone !== 'unknown'} /> : <Recovery onEdit={() => setEditing(true)} />}
-      <TodayWorkout />
-      <Coach />
-      <AskPace />
-      {!demo && data.sessions.length < 3 ? <Row><Txt v="fine">See every feature with sample data.</Txt><Button small title="Try demo" onPress={startDemo} /></Row> : null}
+      <TwoCol
+        left={<>
+          {r.zone === 'unknown' || editing ? <CheckIn onDone={() => setEditing(false)} canCancel={r.zone !== 'unknown'} /> : <Recovery onEdit={() => setEditing(true)} />}
+          <TodayWorkout />
+        </>}
+        right={<>
+          <Coach />
+          <AskPace />
+          {!demo && data.sessions.length < 3 ? <Row><Txt v="fine">See every feature with sample data.</Txt><Button small title="Try demo" onPress={startDemo} /></Row> : null}
+        </>}
+      />
     </Screen>
   );
 }

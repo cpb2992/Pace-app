@@ -7,7 +7,7 @@ import { rxText } from '../../engine/training';
 import { clone, letter, uid } from '../../engine/util';
 import type { Block } from '../../engine/types';
 import { useApp } from '../../store/AppStore';
-import { Badge, Button, Card, CommitField, Confirm, Row, Screen, Section, Segmented, Txt } from '../../ui/components';
+import { Badge, Button, Card, CommitField, Confirm, Grid, Row, Screen, Section, Segmented, Txt } from '../../ui/components';
 import { useTheme } from '../../ui/theme';
 
 export default function ProgramScreen() {
@@ -28,7 +28,7 @@ export default function ProgramScreen() {
     <Screen title="Program" eyebrow={data.program.source === 'starter' ? 'Starter template' : `By ${coach}`}>
       {blocks.length > 1 ? <Segmented options={blocks.map(b => ({ label: b.name, value: b.id }))} value={sel.id} onChange={id => { setSelId(id); setConfirmBlock(false); }} /> : null}
       <Section>{status}</Section>
-      {sel.days.map(d => (
+      <Grid>{sel.days.map(d => (
         <Card key={d.id} onPress={demo ? undefined : () => router.push({ pathname: '/program/[dayId]', params: { dayId: d.id, blockId: sel.id } })}>
           <Row>
             <View><Txt v="label">{d.dow != null ? `${DOWL[d.dow]}s` : 'Any day'}</Txt><Txt v="h2">{d.name}</Txt></View>
@@ -44,7 +44,7 @@ export default function ProgramScreen() {
             ))}
           </View>
         </Card>
-      ))}
+      ))}</Grid>
       {demo ? <Txt v="fine">Exit demo to edit your program.</Txt> : (
         <Card>
           <Txt v="h2">Block settings</Txt>

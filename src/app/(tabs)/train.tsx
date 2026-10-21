@@ -5,7 +5,7 @@ import { isFree, plates, rxText, topStr, ZONES } from '../../engine/training';
 import type { Exercise, ZoneOrUnknown } from '../../engine/types';
 import { fmtW, letter, num } from '../../engine/util';
 import { useApp, useDayIdx, type Draft } from '../../store/AppStore';
-import { Badge, Button, Card, Chip, Confirm, Field, Row, Screen, Section, success, Tag, tap, Txt } from '../../ui/components';
+import { Badge, Button, Card, Chip, Confirm, Field, Grid, Row, Screen, Section, success, Tag, tap, Txt } from '../../ui/components';
 import { useTheme } from '../../ui/theme';
 import { VideoTile } from '../../ui/VideoTile';
 
@@ -149,7 +149,7 @@ export default function Train() {
         <DateField value={cur.date} onCommit={date => setDraft({ ...cur, date })} />
         <Txt v="fine">Reps left: how many more clean reps you had. 0 means failure.</Txt>
       </Card>
-      {day.exercises.map((ex, i) => <ExerciseCard key={ex.id} ex={ex} i={i} zone={zone} draft={cur} setDraft={setDraft} />)}
+      <Grid>{day.exercises.map((ex, i) => <ExerciseCard key={ex.id} ex={ex} i={i} zone={zone} draft={cur} setDraft={setDraft} />)}</Grid>
       {msg ? <Txt v="body" style={{ fontWeight: '500' }}>{msg}</Txt> : null}
       <Button kind="primary" wide title="Finish workout" onPress={finish} disabled={demo} />
       <Section>Recent sessions</Section>

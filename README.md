@@ -11,6 +11,7 @@ Built with Expo (React Native), so one codebase ships to iPhone and Android.
 - **Train.** Each exercise has its how-to video, the Pace target and plate math, set-by-set logging with "reps left", and history.
 - **Program.** Blocks of workouts (October, then Nov/Dec from Nov 5) that switch over on their start date. Edit any workout or exercise and attach a YouTube link or your own clip.
 - **Trends.** 30-day recovery and HRV, weekly effort mix, lift trends (estimated max), and strength change by recovery zone.
+- **Foldables and tablets.** On a wide screen (an unfolded Galaxy Z Fold, a tablet, or a phone turned sideways) screens switch to two columns, and the layout updates live when you fold or unfold.
 - **Settings.** Dark / Light / Auto theme, WHOOP export import, a morning reminder notification, pasting a new block, CSV history import, coach voice (No filter / Clean), and erasing data.
 
 Your coach's program and your close-grip history are preloaded in `src/engine/seed.ts`. Exercises marked "placeholder" still need their real sets and reps.

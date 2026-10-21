@@ -4,11 +4,11 @@
     "slug": "pace-training",
     "scheme": "pace",
     "version": "1.0.0",
-    "orientation": "portrait",
+    "orientation": "default",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "supportsTablet": false,
+      "supportsTablet": true,
       "bundleIdentifier": "com.pacetraining.app",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false

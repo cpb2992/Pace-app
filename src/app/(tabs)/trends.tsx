@@ -3,7 +3,7 @@ import { addDays, fmtShort, weekStart } from '../../engine/dates';
 import { bestRaw, topStr } from '../../engine/training';
 import { avg, key } from '../../engine/util';
 import { useApp } from '../../store/AppStore';
-import { Card, Row, Screen, Txt } from '../../ui/components';
+import { Card, Grid, Row, Screen, Txt } from '../../ui/components';
 import { HrvLine, MixBar, RecoveryBars, Sparkline } from '../../ui/charts';
 import { useTheme } from '../../ui/theme';
 
@@ -50,6 +50,7 @@ export default function Trends() {
 
   return (
     <Screen title="Trends" eyebrow="Last 30 days">
+      <Grid>
       <Card>
         <Row><Txt v="h2">Recovery</Txt>{have.length ? <Txt v="fine">Avg {Math.round(avg(have)!)}%</Txt> : null}</Row>
         {have.length ? <>
@@ -109,6 +110,7 @@ export default function Trends() {
           <Txt v="fine">Average change per lift versus the previous session.</Txt>
         </Card>
       ) : null}
+      </Grid>
     </Screen>
   );
 }

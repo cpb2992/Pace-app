@@ -7,7 +7,7 @@ import { backendReady, getDeviceId, parseProgramRemote, syncWhoop, whoopConnectU
 import { deleteClip, pickHistoryCSV, pickWhoopExport } from '../../services/files';
 import { remindersSupported, setMorningReminder } from '../../services/reminders';
 import { useApp } from '../../store/AppStore';
-import { Button, Card, CommitField, Confirm, Row, Screen, Section, Segmented, Txt } from '../../ui/components';
+import { Button, Card, CommitField, Confirm, Row, Screen, Section, Segmented, TwoCol, Txt } from '../../ui/components';
 import { useTheme } from '../../ui/theme';
 
 export default function Settings() {
@@ -82,6 +82,7 @@ export default function Settings() {
   const nWorkouts = data.program.blocks.reduce((a, b) => a + b.days.length, 0);
   return (
     <Screen title="Settings">
+      <TwoCol left={<>
       <Section>Appearance</Section>
       <Card>
         <Row><Txt v="h3">Theme</Txt><View style={{ width: 210 }}><Segmented options={[{ label: 'Dark', value: 'dark' as const }, { label: 'Light', value: 'light' as const }, { label: 'Auto', value: 'system' as const }]} value={s.appearance} onChange={v => mutate(d => { d.settings.appearance = v; })} /></View></Row>
@@ -136,6 +137,7 @@ export default function Settings() {
         {histMsg ? <Txt v="body" style={{ fontWeight: '500' }}>{histMsg}</Txt> : null}
       </Card>
 
+      </>} right={<>
       <Section>Coaching</Section>
       <Card>
         <Txt v="h2">Coach voice</Txt>
@@ -159,6 +161,7 @@ export default function Settings() {
           ? <Confirm text="Erase every check-in, import, session, workout and clip? This can't be undone." confirm="Erase all data" onConfirm={() => { Object.values(data.videos).forEach(v => { if (v.kind === 'clip') deleteClip(v.uri); }); setMorningReminder(false, 0, 0).catch(() => {}); eraseAll(); setConfirmErase(false); }} onCancel={() => setConfirmErase(false)} />
           : <Button kind="dangerLink" title="Erase all data" onPress={() => setConfirmErase(true)} />}
       </Card>
+      </>} />
       <Txt v="label" style={{ textAlign: 'center', marginTop: 8 }}>Pace 1.0</Txt>
     </Screen>
   );

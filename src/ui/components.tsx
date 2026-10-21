@@ -1,6 +1,6 @@
 import * as Haptics from 'expo-haptics';
-import { useState, type ReactNode } from 'react';
-import { Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View, type StyleProp, type TextInputProps, type TextStyle, type ViewStyle } from 'react-native';
+import { Children, useState, type ReactNode } from 'react';
+import { Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, useWindowDimensions, View, type StyleProp, type TextInputProps, type TextStyle, type ViewStyle } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Circle } from 'react-native-svg';
 import { radius, useTheme, zoneColor } from './theme';
@@ -24,13 +24,43 @@ export function Txt({ v = 'body', color, style, children, numberOfLines }: { v?:
   return <Text numberOfLines={numberOfLines} style={[base[v], color ? { color } : null, style]}>{children}</Text>;
 }
 
+/** True on wide screens: an unfolded foldable, a tablet, or a phone in landscape. */
+export function useWide() {
+  const { width } = useWindowDimensions();
+  return width >= 720;
+}
+
+/** Two independent columns on wide screens; one stacked column (left, then right) on phones. */
+export function TwoCol({ left, right }: { left: ReactNode; right: ReactNode }) {
+  const wide = useWide();
+  if (!wide) return <>{left}{right}</>;
+  return (
+    <View style={{ flexDirection: 'row', gap: 12, alignItems: 'flex-start' }}>
+      <View style={{ flex: 1, gap: 12, minWidth: 0 }}>{left}</View>
+      <View style={{ flex: 1, gap: 12, minWidth: 0 }}>{right}</View>
+    </View>
+  );
+}
+
+/** Cards side by side, two per row, on wide screens; a normal stack on phones. */
+export function Grid({ children }: { children: ReactNode }) {
+  const wide = useWide();
+  if (!wide) return <>{children}</>;
+  return (
+    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12, alignItems: 'flex-start' }}>
+      {Children.toArray(children).map((c, i) => <View key={i} style={{ flexBasis: '48%', flexGrow: 1, minWidth: 0 }}>{c}</View>)}
+    </View>
+  );
+}
+
 /** Scrolling page with an iOS-style large title. */
 export function Screen({ title, eyebrow, sub, right, children }: { title: string; eyebrow?: ReactNode; sub?: string; right?: ReactNode; children: ReactNode }) {
   const t = useTheme();
   const insets = useSafeAreaInsets();
+  const wide = useWide();
   return (
     <ScrollView style={{ flex: 1, backgroundColor: t.bg }} contentContainerStyle={{ paddingTop: insets.top + 8, paddingBottom: 32, paddingLeft: Math.max(16, insets.left), paddingRight: Math.max(16, insets.right) }} keyboardShouldPersistTaps="handled">
-      <View style={{ width: '100%', maxWidth: 620, alignSelf: 'center', gap: 12 }}>
+      <View style={{ width: '100%', maxWidth: wide ? 1040 : 620, alignSelf: 'center', gap: 12 }}>
         <View style={{ flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', paddingTop: 8, paddingBottom: 4 }}>
           <View style={{ flex: 1, gap: 2 }}>
             {typeof eyebrow === 'string' ? <Txt v="sub">{eyebrow}</Txt> : eyebrow}
