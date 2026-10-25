@@ -1,0 +1,13 @@
+today shows the rank
+tapped 'Set 1 reps' at 102 457
+tapped '^0 reps left\|' at 134 457
+tapped 'Finish workout' at 160 401
+tapped '^\|Open crate$' at 160 442
+crate opened
+tapped '^\|Too easy$' at 75 478
+feedback queued a change
+alive after train: RUNNING
+coach setup shows
+settings shows the WHOOP setup
+WHOOP return handles a code safely
+alive at end: RUNNING

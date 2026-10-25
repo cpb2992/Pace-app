@@ -1,0 +1,9 @@
+# Minimal Supabase CLI config for Pace's edge functions.
+# Run `supabase init` if the CLI asks for a full config; keep these function settings.
+
+[functions.coach]
+verify_jwt = true
+
+[functions.whoop]
+# WHOOP's browser redirects can't carry a Supabase JWT; the function validates its own state values.
+verify_jwt = false

@@ -1,0 +1,82 @@
+# Installs Pace on an Android emulator, taps through Train, results, Coach and Settings, and saves logs and screenshots.
+# Runs on pushes to debug/* branches so it never touches Releases.
+name: Smoke test on an emulator
+
+on:
+  push:
+    branches: ['debug/**']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate the Android project
+        run: npx expo prebuild --platform android --no-install
+
+      - name: Build for the emulator (x86_64)
+        working-directory: android
+        run: |
+          mkdir -p ../smoke
+          set -o pipefail
+          ./gradlew assembleRelease --no-daemon -PreactNativeArchitectures=x86_64 2>&1 | tee ../smoke/build.log | grep -E "BUILD|FAILURE|error:|What went wrong" || true
+          test -f app/build/outputs/apk/release/app-release.apk
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Run on the emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          target: google_apis
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -timezone America/New_York
+          script: bash .github/smoke.sh
+
+      - name: Summarize
+        if: always()
+        run: |
+          for f in smoke/a-launch.txt smoke/steps.txt; do
+            [ -f "$f" ] && echo "::notice title=$(basename $f)::$(tr '\n' ' ' < $f)"
+          done
+          true
+
+      - name: Push logs to a branch
+        if: always()
+        run: |
+          git config user.name "pace-smoke"
+          git config user.email "pace-smoke@users.noreply.github.com"
+          B="logs/${GITHUB_REF_NAME//\//-}-${GITHUB_RUN_ID}"
+          git checkout --orphan "$B"
+          git rm -rq --cached . || true
+          mkdir -p smoke && touch smoke/.keep
+          [ -f smoke/build.log ] && tail -c 400000 smoke/build.log > smoke/build-tail.log && rm smoke/build.log
+          git add -f smoke
+          git commit -qm "Smoke logs for $GITHUB_SHA"
+          git push -q origin "$B"
