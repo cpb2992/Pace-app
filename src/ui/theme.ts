@@ -8,6 +8,8 @@ const light = {
   accent: '#2557F5', accentInk: '#FFFFFF', accentSoft: '#E8EEFF',
   go: '#138A55', goSoft: '#E2F4EA', hold: '#B56F00', holdSoft: '#FCF0DA', stop: '#D2372C', stopSoft: '#FDE7E4',
   tileA: '#262A31', tileB: '#121418', easy: '#CFD4DB', steady: '#9DB2F6',
+  // Points: gold for points, violet for crits and epic loot.
+  xp: '#B87A00', xpSoft: '#FCF0D6', crit: '#7B4DFF', critSoft: '#EEE8FF', rare: '#2557F5', epic: '#7B4DFF', legendary: '#C77700',
   scheme: 'light' as 'light' | 'dark',
 };
 const dark: typeof light = {
@@ -16,6 +18,7 @@ const dark: typeof light = {
   accent: '#4C71FF', accentInk: '#FFFFFF', accentSoft: '#1B2549',
   go: '#36C87D', goSoft: '#11291C', hold: '#F0B43C', holdSoft: '#2E2410', stop: '#FF6458', stopSoft: '#351715',
   tileA: '#262A31', tileB: '#0E1013', easy: '#3A3F47', steady: '#3651B3',
+  xp: '#FFC34D', xpSoft: '#2F2510', crit: '#A98BFF', critSoft: '#251C45', rare: '#5C80FF', epic: '#A98BFF', legendary: '#FFC34D',
   scheme: 'dark',
 };
 export type Theme = typeof light;

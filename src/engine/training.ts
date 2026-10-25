@@ -195,6 +195,20 @@ export class Ctx {
       reps = Math.min(hi, maxR + 1); tag = 'reps'; tagText = '+1 rep';
       why = reps > maxR ? `Same weight. Beat ${maxR} on set 1.` : `Hit ${hi} on every set, then the weight goes up.`;
     }
+    // Feedback from the coach chat or the post-workout check changes the next target once.
+    const nudge = this.data.coach?.nudges?.find(x => key(x.ex) === key(ex.name));
+    if (nudge) {
+      const said = `Coach: ${nudge.reason.replace(/[.!]$/, '')}.`;
+      if (nudge.change === 'down') {
+        if (loaded) w = Math.min(w, roundW(Math.max(0, topW - inc), ex)); else reps = Math.max(lo, Math.min(reps, maxR - 2));
+        tag = 'down'; tagText = 'Lighter'; why = `${said} Down a step.`;
+      } else if (zone !== 'red' && nudge.change === 'up') {
+        if (loaded) { w = roundW(topW + inc, ex); reps = lo; tag = 'up'; tagText = `+${inc} lb`; } else { reps = Math.min(hi, maxR + 2); tag = 'reps'; tagText = '+2 reps'; }
+        why = `${said} Up a step.`;
+      } else if (zone !== 'red' && nudge.change === 'hold') {
+        w = topW; reps = Math.min(hi, maxR); tag = 'hold'; tagText = 'Hold'; why = `${said} Repeat last time.`;
+      }
+    }
     return { kind: 'lift', w, reps, sets: n, tag, tagText, why, last: lastStr, effort };
   }
 

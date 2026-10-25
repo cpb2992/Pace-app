@@ -32,6 +32,16 @@ export function normalizeProgram(p: unknown): Program {
   return { source: src.source === 'starter' ? 'starter' : 'coach', updated: typeof src.updated === 'string' ? src.updated : null, blocks };
 }
 
+function normalizeCoach(raw: unknown): AppData['coach'] {
+  const c = (raw && typeof raw === 'object' ? raw : {}) as Record<string, unknown>;
+  const list = <T>(v: unknown, ok: (x: T) => boolean): T[] => (Array.isArray(v) ? (v as T[]).filter(x => x && typeof x === 'object' && ok(x)) : []);
+  return {
+    msgs: list<AppData['coach']['msgs'][number]>(c.msgs, m => typeof m.text === 'string' && (m.role === 'me' || m.role === 'coach')).slice(-200),
+    notes: list<AppData['coach']['notes'][number]>(c.notes, n => typeof n.text === 'string'),
+    nudges: list<AppData['coach']['nudges'][number]>(c.nudges, n => typeof n.ex === 'string' && ['up', 'down', 'hold'].includes(n.change)),
+  };
+}
+
 export function normalizeData(raw: unknown): AppData {
   const base = freshData();
   if (!raw || typeof raw !== 'object') return base;
@@ -44,6 +54,9 @@ export function normalizeData(raw: unknown): AppData {
     program: s.program ? normalizeProgram(s.program) : base.program,
     videos: s.videos && typeof s.videos === 'object' ? (s.videos as AppData['videos']) : {},
     whoop: s.whoop && typeof s.whoop === 'object' ? (s.whoop as AppData['whoop']) : {},
+    whoopWorkouts: s.whoopWorkouts && typeof s.whoopWorkouts === 'object' ? (s.whoopWorkouts as AppData['whoopWorkouts']) : {},
+    whoopSync: typeof s.whoopSync === 'string' ? s.whoopSync : null,
     sessions: Array.isArray(s.sessions) ? (s.sessions as AppData['sessions']).filter(x => x && x.date && Array.isArray(x.sets)) : base.sessions,
+    coach: normalizeCoach(s.coach),
   };
 }

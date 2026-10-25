@@ -84,11 +84,14 @@ export const STARTER_PROGRAM = (): Program => {
 
 export const freshData = (): AppData => ({
   version: 3,
-  settings: { tone: 'nofilter', appearance: 'dark', bar: 45, coach: 'Sarah', reminder: { on: false, hour: 7, minute: 0 } },
+  settings: { tone: 'nofilter', appearance: 'dark', bar: 45, coach: 'Sarah', reminder: { on: false, hour: 7, minute: 0 }, speak: false, game: true },
   program: JSON.parse(JSON.stringify(SARAH_PROGRAM)),
   videos: {},
   whoop: {},
+  whoopWorkouts: {},
+  whoopSync: null,
   sessions: JSON.parse(JSON.stringify(SARAH_HISTORY)),
+  coach: { msgs: [], notes: [], nudges: [] },
 });
 
 /** Six weeks of sample data that shows a lifter coasting on bench while RDL climbs. Never saved. */
@@ -120,5 +123,5 @@ export function makeDemo(today: string, settings: AppData['settings']): AppData 
     }
     sessions.push({ id: 'demo' + i, date: d, day: day.name, zone: zoneOf(whoop[d].rec), rec: whoop[d].rec, src: 'demo', sets });
   }
-  return { version: 3, settings: { ...settings }, program, videos: {}, whoop, sessions };
+  return { version: 3, settings: { ...settings }, program, videos: {}, whoop, whoopWorkouts: {}, whoopSync: null, sessions, coach: { msgs: [], notes: [], nudges: [] } };
 }

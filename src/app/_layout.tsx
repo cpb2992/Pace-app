@@ -22,6 +22,9 @@ function Shell() {
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="program/[dayId]" options={{ headerShown: true, title: '', headerBackTitle: 'Program', headerStyle: { backgroundColor: t.bg }, headerTintColor: t.accent, headerShadowVisible: false }} />
           <Stack.Screen name="video" options={{ presentation: 'modal', headerShown: false }} />
+          <Stack.Screen name="settings" options={{ headerShown: true, title: '', headerBackTitle: 'Today', headerStyle: { backgroundColor: t.bg }, headerTintColor: t.accent, headerTitleStyle: { color: t.ink }, headerShadowVisible: false }} />
+          <Stack.Screen name="results" options={{ presentation: 'modal', headerShown: false, gestureEnabled: false }} />
+          <Stack.Screen name="whoop" options={{ headerShown: false }} />
         </Stack>
       ) : null}
       <BootSplash ready={ready} />

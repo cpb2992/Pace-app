@@ -4,6 +4,7 @@ import { bestRaw, topStr } from '../../engine/training';
 import { avg, key } from '../../engine/util';
 import { useApp } from '../../store/AppStore';
 import { Card, Grid, Row, Screen, Txt } from '../../ui/components';
+import { fmtPts } from '../../ui/game';
 import { HrvLine, MixBar, RecoveryBars, Sparkline } from '../../ui/charts';
 import { useTheme } from '../../ui/theme';
 
@@ -14,7 +15,7 @@ const Legend = ({ items }: { items: [string, string][] }) => (
 );
 
 export default function Trends() {
-  const { ctx, data, today } = useApp();
+  const { ctx, data, today, game } = useApp();
   const t = useTheme();
   const days = Array.from({ length: 30 }, (_, i) => addDays(today, i - 29));
   const recs = days.map(d => data.whoop[d]?.rec ?? null);
@@ -48,9 +49,28 @@ export default function Trends() {
   }
   const payN = pay.green.length + pay.yellow.length + pay.red.length;
 
+  // Points per week, last 8 weeks.
+  const ptsWeeks = Array.from({ length: 8 }, (_, i) => addDays(start, -7 * (7 - i))).map(w => ({ w, pts: game.weeks.find(x => x.week === w)?.pts ?? 0 }));
+  const ptsMax = Math.max(1, ...ptsWeeks.map(w => w.pts));
+  const bestWeek = Math.max(0, ...game.weeks.map(w => w.pts));
+
   return (
-    <Screen title="Trends" eyebrow="Last 30 days">
+    <Screen title="Trends" eyebrow="Your numbers">
       <Grid>
+      {data.settings.game ? (
+        <Card>
+          <Row><Txt v="h2">Points</Txt><Txt v="fine">{`${game.rank} · best week ${fmtPts(bestWeek)}`}</Txt></Row>
+          <View style={{ flexDirection: 'row', alignItems: 'flex-end', gap: 6, height: 120 }}>
+            {ptsWeeks.map((w, i) => (
+              <View key={w.w} style={{ flex: 1, alignItems: 'center', gap: 4, height: '100%', justifyContent: 'flex-end' }}>
+                {w.pts ? <Txt v="label" style={{ fontSize: 10.5 }}>{w.pts >= 1000 ? `${(w.pts / 1000).toFixed(1)}k` : String(w.pts)}</Txt> : null}
+                <View style={{ width: '100%', height: `${Math.max(2, (w.pts / ptsMax) * 78)}%`, borderRadius: 5, backgroundColor: i === ptsWeeks.length - 1 ? t.xp : t.xpSoft, borderWidth: i === ptsWeeks.length - 1 ? 0 : 1, borderColor: t.xp }} />
+              </View>
+            ))}
+          </View>
+          <Row><Txt v="label">{fmtShort(ptsWeeks[0].w)}</Txt><Txt v="label">This week</Txt></Row>
+        </Card>
+      ) : null}
       <Card>
         <Row><Txt v="h2">Recovery</Txt>{have.length ? <Txt v="fine">Avg {Math.round(avg(have)!)}%</Txt> : null}</Row>
         {have.length ? <>

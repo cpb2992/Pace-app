@@ -45,7 +45,22 @@ export interface WhoopDay {
   strain?: number | null;
   perf?: number | null;
   debt?: number | null;
+  spo2?: number | null;
+  temp?: number | null;
   src: 'export' | 'manual' | 'demo' | 'api';
+}
+
+/** A workout WHOOP recorded (any sport), pulled by live sync. */
+export interface WhoopWorkout {
+  id: string;
+  date: string;
+  sport: string;
+  start: string;
+  end: string;
+  strain: number | null;
+  avgHr: number | null;
+  maxHr: number | null;
+  kj: number | null;
 }
 
 export interface LoggedSet {
@@ -53,6 +68,20 @@ export interface LoggedSet {
   w: number;
   r: number;
   rir: number | null;
+}
+
+export type Feel = 'easy' | 'right' | 'hard' | 'hurt';
+export type LootTier = 'common' | 'rare' | 'epic' | 'legendary';
+
+/** Double or nothing: points staked on hitting a set's target. */
+export interface Bet {
+  ex: string;
+  /** Which logged set of that exercise (0-based). */
+  set: number;
+  stake: number;
+  w: number;
+  reps: number;
+  won: boolean;
 }
 
 export interface Session {
@@ -63,7 +92,27 @@ export interface Session {
   rec: number | null;
   src?: 'app' | 'coach' | 'import' | 'demo';
   sets: LoggedSet[];
+  bets?: Bet[];
+  loot?: { tier: LootTier; pts: number };
+  feel?: Feel;
 }
+
+export interface CoachMsg {
+  id: string;
+  role: 'me' | 'coach';
+  text: string;
+  at: string;
+  /** What the coach changed because of this message ("Leg Press +10 lb next time"). */
+  changes?: string[];
+}
+
+/** Something the coach should always keep in mind ("Left shoulder gets cranky on presses"). */
+export interface CoachNote { id: string; text: string; at: string }
+
+/** A one-time change to an exercise's next target, from feedback. Used up by the next session of that exercise. */
+export interface Nudge { ex: string; change: 'up' | 'down' | 'hold'; reason: string; at: string }
+
+export interface CoachState { msgs: CoachMsg[]; notes: CoachNote[]; nudges: Nudge[] }
 
 export type Video =
   | { kind: 'yt'; id: string; start: number; shorts: boolean }
@@ -77,6 +126,10 @@ export interface Settings {
   bar: number;
   coach: string;
   reminder: { on: boolean; hour: number; minute: number };
+  /** Read the coach's replies out loud. */
+  speak: boolean;
+  /** Points, crits, bets and loot. */
+  game: boolean;
 }
 
 export interface AppData {
@@ -85,5 +138,9 @@ export interface AppData {
   program: Program;
   videos: Record<string, Video>;
   whoop: Record<string, WhoopDay>;
+  whoopWorkouts: Record<string, WhoopWorkout>;
+  /** When WHOOP live sync last succeeded (ISO time). */
+  whoopSync: string | null;
   sessions: Session[];
+  coach: CoachState;
 }

@@ -6,13 +6,18 @@ Built with Expo (React Native), so one codebase ships to iPhone and Android.
 
 ## What's in the app
 
-- **Boot screen.** The Pace mark and a progress bar on black, then a fade into the app.
-- **Today.** A recovery ring (WHOOP zones: 67+ recovered, 34–66 moderate, under 34 low), today's workout with a weight target for every exercise, and the coach card. The coach calls out coasting when sets end with 3+ reps left, lifts stall, or green days go to maintenance.
-- **Train.** Each exercise has its how-to video, the Pace target and plate math, set-by-set logging with "reps left", and history.
-- **Program.** Blocks of workouts (October, then Nov/Dec from Nov 5) that switch over on their start date. Edit any workout or exercise and attach a YouTube link or your own clip.
-- **Trends.** 30-day recovery and HRV, weekly effort mix, lift trends (estimated max), and strength change by recovery zone.
-- **Foldables and tablets.** On a wide screen (an unfolded Galaxy Z Fold, a tablet, or a phone turned sideways) screens switch to two columns, and the layout updates live when you fold or unfold.
-- **Settings.** Dark / Light / Auto theme, WHOOP export import, a morning reminder notification, pasting a new block, CSV history import, coach voice (No filter / Clean), and erasing data.
+- **Today.** Your rank, points and weekly streak; the recovery ring (WHOOP zones: 67+ recovered, 34–66 moderate, under 34 low), synced from WHOOP; today's workout with a weight target for every exercise; today's bounties; and the coasting check (sets ending with 3+ reps left, stalled lifts, green days spent maintaining).
+- **Train.** How-to video, Pace target and plate math for every exercise, set-by-set logging with "reps left", and live points on every set: crits, PRs, double-or-nothing bets and bounty progress.
+- **Results.** After each workout: the points breakdown, level progress, a loot crate, and Too easy / Just right / Too hard / Something hurt feedback that changes your next targets.
+- **Coach.** A chat with an AI coach (type or talk) that reads your WHOOP data, every logged set and the coach's program, remembers what matters (injuries, equipment, preferences), and nudges next session's targets when you give feedback. Optional read-aloud.
+- **Trends.** Points per week, 30-day recovery and HRV, weekly effort mix, lift trends (estimated max), and strength change by recovery zone.
+- **Program.** Blocks of workouts that switch over on their start date. Edit any workout or exercise and attach a YouTube link or your own clip.
+- **Settings** (gear on Today). WHOOP live sync, WHOOP export import, the Claude key, coach voice, points on/off, theme, morning reminder, pasting a new block, CSV history import, erasing data.
+- **Foldables and tablets.** On wide screens, screens switch to two columns and update live when you fold or unfold.
+
+### How points work
+
+Every rep is 10 points; heavier than last time ×1.25. Effort pays by recovery: failure on green days (1 rep left on barbell lifts), 2 left on yellow, 3 left on red; coasting barely scores. Any set can crit ×2, ×3 or hit a ×5 jackpot, with better odds on harder sets. PRs +150, rep records +60, beating last time +40, plus daily bounties (break a stalled lift, fight to failure, honest logging, back off on red days). Up to three double-or-nothing bets per workout (none on red days), a loot crate after every workout with better odds for better effort, and weekly streaks that multiply points up to ×1.5. Sleep, check-ins and respecting red days earn points too. The engine is `src/engine/game.ts`; everything except bets and loot is recomputed from the training log.
 
 Your coach's program and your close-grip history are preloaded in `src/engine/seed.ts`. Exercises marked "placeholder" still need their real sets and reps.
 
@@ -46,32 +51,20 @@ Every push to `main` builds `Pace.apk` with GitHub Actions and posts it on the r
 
 This build is signed with a debug key: fine for your own phone, not for the Play Store (that's step 3).
 
-## 2. Turn on the AI coach and WHOOP live sync (backend)
+## 2. Turn on the AI coach and WHOOP live sync
 
-The backend lives in `supabase/`: two Edge Functions and one database migration.
+Both run straight from the phone. Nothing to deploy.
 
-1. Create a project at [supabase.com](https://supabase.com) and install the [Supabase CLI](https://supabase.com/docs/guides/cli).
-2. Link and set up the database:
-   ```bash
-   supabase link --project-ref <your-project-ref>
-   supabase db push
-   ```
-3. Add secrets (get a Claude API key at [platform.claude.com](https://platform.claude.com)):
-   ```bash
-   supabase secrets set ANTHROPIC_API_KEY=sk-ant-...
-   supabase secrets set WHOOP_CLIENT_ID=... WHOOP_CLIENT_SECRET=... \
-     WHOOP_REDIRECT_URL=https://<your-project-ref>.supabase.co/functions/v1/whoop/callback
-   ```
-4. Deploy:
-   ```bash
-   supabase functions deploy coach
-   supabase functions deploy whoop --no-verify-jwt
-   ```
-5. Copy `.env.example` to `.env` and fill in your project URL and anon key. Restart `npx expo start`. For the GitHub-built APK, add the same two values as repository secrets (`EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_ANON_KEY`) and re-run the build.
+**AI coach:** make an API key at [platform.claude.com](https://platform.claude.com/settings/keys) and paste it in the Coach tab (or Settings › Coach). It's kept in the phone's secure storage. Each coach message is one Claude API call (Sonnet); reading a pasted program uses Haiku.
 
-**WHOOP developer setup:** at [developer.whoop.com](https://developer.whoop.com), sign in with your WHOOP account and create an app. Add the redirect URL from step 3 and request the scopes `read:recovery read:sleep read:cycles offline`. Submit the app for WHOOP's approval before launch. WHOOP's default limit is 100 requests a minute and 10,000 a day per app.
+**WHOOP:** at [developer.whoop.com](https://developer.whoop.com), create an app with
+- redirect URL `pace://whoop`
+- privacy policy `https://github.com/cpb2992/Pace-app/blob/main/PRIVACY.md`
+- scopes `read:recovery`, `read:cycles`, `read:sleep`, `read:workout`
 
-**AI costs:** each "Ask Pace" question is one Claude API call (Sonnet for coaching, Haiku for reading pasted programs). Price your subscription to cover it.
+Paste its Client ID and Secret in Settings › WHOOP and tap Connect. Pace then syncs the last 30 days on launch and whenever it comes back to the front (at most every 45 minutes). Sandbox apps work for up to 10 WHOOP members without review, which covers personal use.
+
+**Before selling:** the WHOOP secret and the user's Claude key live on the phone, which is fine for your own use but not for a store app. The `supabase/` folder holds a backend (coach proxy, WHOOP OAuth with server-side tokens) to switch to: create a Supabase project, `supabase db push`, set `ANTHROPIC_API_KEY`, `WHOOP_CLIENT_ID`, `WHOOP_CLIENT_SECRET` and `WHOOP_REDIRECT_URL` as secrets, and deploy the `coach` and `whoop` functions (`--no-verify-jwt` for whoop). Submit the WHOOP app for approval before launch; WHOOP allows 100 requests a minute and 10,000 a day per app.
 
 ## 3. Publish to the App Store and Google Play
 
@@ -107,7 +100,7 @@ Builds run in the cloud with EAS, so no Xcode or Android Studio is needed.
 src/app/            screens (Expo Router): tabs, workout editor, video sheet, WHOOP return
 src/engine/         training logic with no UI: prescriptions, coasting check, parsers, seed data, coach prompt
 src/store/          app state and on-device persistence
-src/services/       file pickers, notifications, backend calls
+src/services/       Claude coach, WHOOP sync, secure storage, speech, file pickers, notifications
 src/ui/             theme, components, charts, boot screen, video tiles
 supabase/           Edge Functions (coach, whoop) and the database migration
 assets/             icon, adaptive icon, splash

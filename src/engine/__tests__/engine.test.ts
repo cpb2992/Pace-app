@@ -101,3 +101,16 @@ test('YouTube links', () => {
   assert.equal(ytLink(w!), 'https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=65s');
   assert.equal(parseYouTube('https://example.com/watch?v=abc'), null);
 });
+
+test('coach nudges change the next target once', () => {
+  const d: AppData = freshData();
+  d.sessions = [{ id: 's', date: '2026-10-20', day: 'Lower', zone: null, rec: null, sets: [10, 10, 10].map(r => ({ ex: 'Leg Press', w: 200, r, rir: 1 })) }];
+  const lp = ex({ name: 'Leg Press', type: 'machine' });
+  d.coach.nudges = [{ ex: 'Leg Press', change: 'up', reason: 'Felt light', at: '2026-10-21' }];
+  let p = new Ctx(d, '2026-10-22').prescribe(lp, 'green');
+  assert.ok(p.kind === 'lift' && p.w === 210 && p.tag === 'up' && p.why.startsWith('Coach: Felt light.'));
+  assert.ok((p = new Ctx(d, '2026-10-22').prescribe(lp, 'red')).kind === 'lift' && p.w === 170, 'no bumps on red days');
+  d.coach.nudges = [{ ex: 'leg press', change: 'down', reason: 'Knee achy', at: '2026-10-21' }];
+  p = new Ctx(d, '2026-10-22').prescribe(lp, 'green');
+  assert.ok(p.kind === 'lift' && p.w === 190 && p.tag === 'down');
+});

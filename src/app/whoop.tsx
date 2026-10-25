@@ -1,35 +1,42 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { View } from 'react-native';
-import { getDeviceId, syncWhoop } from '../services/backend';
+import { finishWhoopLogin } from '../services/whoop';
 import { useApp } from '../store/AppStore';
-import { Button, Txt } from '../ui/components';
+import { Button, Logo, Txt } from '../ui/components';
 import { useTheme } from '../ui/theme';
 
-/** WHOOP sends users back to pace://whoop after sign-in. This screen pulls their data, then returns to Settings. */
+/** WHOOP sends the browser back to pace://whoop. If the app (not the sign-in sheet) catches it, finish here. */
 export default function WhoopReturn() {
-  const { connected, error } = useLocalSearchParams<{ connected?: string; error?: string }>();
-  const { mutate } = useApp();
+  const { code, state, error, error_description } = useLocalSearchParams<{ code?: string; state?: string; error?: string; error_description?: string }>();
+  const { syncWhoop, refreshWhoop } = useApp();
   const t = useTheme();
-  const [msg, setMsg] = useState(connected ? 'Connected. Pulling your last 30 days…' : 'WHOOP sign-in was cancelled.');
+  const [msg, setMsg] = useState(error ? (error === 'access_denied' ? 'WHOOP access was not allowed.' : `WHOOP said: ${error_description || error}`) : code ? 'Connecting to WHOOP…' : 'Back from WHOOP.');
+  const [done, setDone] = useState(!code || !!error);
 
   useEffect(() => {
-    if (!connected || error) return;
+    if (!code || error) return;
+    let alive = true;
     (async () => {
       try {
-        const days = await syncWhoop(await getDeviceId());
-        mutate(d => { Object.assign(d.whoop, days); });
-        setMsg(`Synced ${Object.keys(days).length} days from WHOOP.`);
-        setTimeout(() => router.replace('/settings'), 900);
-      } catch (e) { setMsg(e instanceof Error ? e.message : 'WHOOP sync failed.'); }
+        await finishWhoopLogin(code, state ?? null);
+        await refreshWhoop();
+        if (alive) setMsg('Connected. Pulling your last 30 days…');
+        await syncWhoop();
+        if (alive) { setMsg('WHOOP is connected. Pace now syncs on its own.'); setDone(true); setTimeout(() => { if (alive) router.replace('/'); }, 1200); }
+      } catch (e) {
+        if (alive) { setMsg(e instanceof Error ? e.message : 'WHOOP sign-in failed.'); setDone(true); }
+      }
     })();
-  }, [connected, error, mutate]);
+    return () => { alive = false; };
+  }, [code, state, error, syncWhoop, refreshWhoop]);
 
   return (
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: 16, padding: 24, backgroundColor: t.bg }}>
+      <Logo size={40} color={t.accent} />
       <Txt v="h2">WHOOP</Txt>
       <Txt v="sub" style={{ textAlign: 'center' }}>{msg}</Txt>
-      <Button title="Back to Settings" onPress={() => router.replace('/settings')} />
+      {done ? <Button title="Back to Pace" onPress={() => router.replace('/')} /> : null}
     </View>
   );
 }

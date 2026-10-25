@@ -3,7 +3,7 @@
     "name": "Pace",
     "slug": "pace-training",
     "scheme": "pace",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "orientation": "default",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
@@ -60,6 +60,17 @@
         {
           "icon": "./assets/android-icon-monochrome.png",
           "color": "#2557F5"
+        }
+      ],
+      "expo-secure-store",
+      [
+        "expo-speech-recognition",
+        {
+          "microphonePermission": "Pace listens when you tap the mic, so you can talk to your coach.",
+          "speechRecognitionPermission": "Pace turns what you say to your coach into text.",
+          "androidSpeechServicePackages": [
+            "com.google.android.googlequicksearchbox"
+          ]
         }
       ]
     ],
