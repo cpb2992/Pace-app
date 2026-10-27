@@ -1,0 +1,13 @@
+today shows recovery
+tapped 'Set 1 reps' at 129 470
+tapped '^0 reps left\|' at 166 470
+tapped 'Finish workout' at 160 552
+tapped '^\|Spin the plate$' at 160 410
+mystery plate spun
+tapped '^\|Too easy$' at 78 490
+feedback queued a change
+alive after train: RUNNING
+coach setup shows
+settings shows the WHOOP setup
+WHOOP return handles a code safely
+alive at end: RUNNING

@@ -1,0 +1,2 @@
+alive: RUNNING
+  mCurrentFocus=Window{4ca8999 u0 com.pacetraining.app/com.pacetraining.app.MainActivity}
