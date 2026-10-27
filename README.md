@@ -7,17 +7,21 @@ Built with Expo (React Native), so one codebase ships to iPhone and Android.
 ## What's in the app
 
 - **Today.** Your rank, points and weekly streak; the recovery ring (WHOOP zones: 67+ recovered, 34–66 moderate, under 34 low), synced from WHOOP; today's workout with a weight target for every exercise; today's bounties; and the coasting check (sets ending with 3+ reps left, stalled lifts, green days spent maintaining).
-- **Train.** How-to video, Pace target and plate math for every exercise, set-by-set logging with "reps left", and live points on every set: crits, PRs, double-or-nothing bets and bounty progress.
-- **Results.** After each workout: the points breakdown, level progress, a loot crate, and Too easy / Just right / Too hard / Something hurt feedback that changes your next targets.
+- **Train.** A stamped target, last time and plate math for every exercise, a how-to video, set-by-set logging with "in the tank" (reps you had left), live points on every set (crits, PRs, double-or-nothing bets, bounty progress), and a Finish bar pinned above the tabs.
+- **Results.** After each workout: the points breakdown, level progress, a mystery plate to spin, and Too easy / Just right / Too hard / Something hurt feedback that changes your next targets.
 - **Coach.** A chat with an AI coach (type or talk) that reads your WHOOP data, every logged set and the coach's program, remembers what matters (injuries, equipment, preferences), and nudges next session's targets when you give feedback. Optional read-aloud.
 - **Trends.** Points per week, 30-day recovery and HRV, weekly effort mix, lift trends (estimated max), and strength change by recovery zone.
 - **Program.** Blocks of workouts that switch over on their start date. Edit any workout or exercise and attach a YouTube link or your own clip.
 - **Settings** (gear on Today). WHOOP live sync, WHOOP export import, the Claude key, coach voice, points on/off, theme, morning reminder, pasting a new block, CSV history import, erasing data.
 - **Foldables and tablets.** On wide screens, screens switch to two columns and update live when you fold or unfold.
 
+### Design
+
+Black iron and chalk, with color borrowed from competition plates: green (10 kg) for recovered and good effort, yellow (15 kg) for moderate days and points, red (25 kg) for low recovery and legendary drops, blue (20 kg) for crits. Chrome stays black and chalk-white so color always means something. Titles and numbers use Big Shoulders Display (condensed, like stamped plates and gym scoreboards); everything you read uses Archivo. Tokens live in `src/ui/theme.ts`, shared components in `src/ui/components.tsx`.
+
 ### How points work
 
-Every rep is 10 points; heavier than last time ×1.25. Effort pays by recovery: failure on green days (1 rep left on barbell lifts), 2 left on yellow, 3 left on red; coasting barely scores. Any set can crit ×2, ×3 or hit a ×5 jackpot, with better odds on harder sets. PRs +150, rep records +60, beating last time +40, plus daily bounties (break a stalled lift, fight to failure, honest logging, back off on red days). Up to three double-or-nothing bets per workout (none on red days), a loot crate after every workout with better odds for better effort, and weekly streaks that multiply points up to ×1.5. Sleep, check-ins and respecting red days earn points too. The engine is `src/engine/game.ts`; everything except bets and loot is recomputed from the training log.
+Every rep is 10 points; heavier than last time ×1.25. Effort pays by recovery: failure on green days (1 rep left on barbell lifts), 2 left on yellow, 3 left on red; coasting barely scores. Any set can crit ×2, ×3 or hit a ×5 jackpot, with better odds on harder sets. PRs +150, rep records +60, beating last time +40, plus daily bounties (break a stalled lift, fight to failure, honest logging, back off on red days). Up to three double-or-nothing bets per workout (none on red days), a mystery plate after every workout (5 kg white common, 10 kg green rare, 20 kg blue epic, 25 kg red legendary) with better odds for better effort, and weekly streaks that multiply points up to ×1.5. Sleep, check-ins and respecting red days earn points too. The engine is `src/engine/game.ts`; everything except bets and loot is recomputed from the training log.
 
 Your coach's program and your close-grip history are preloaded in `src/engine/seed.ts`. Exercises marked "placeholder" still need their real sets and reps.
 
