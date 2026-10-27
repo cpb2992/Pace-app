@@ -1,7 +1,7 @@
 import * as Haptics from 'expo-haptics';
 import { router } from 'expo-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Animated, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Animated, Pressable, StyleSheet, Text, TextInput, useWindowDimensions, View } from 'react-native';
 import { fmtLong, fmtMid } from '../../engine/dates';
 import { bestEffort, betWon, bountiesToday, MAX_BETS, scoreDraft, STAKES, type SessionScore, type SetScore } from '../../engine/game';
 import { isFree, plates, rxText, topStr, ZONES, type Prescription } from '../../engine/training';
@@ -15,6 +15,12 @@ import { F, numStyle, radius, useTheme, zoneColor } from '../../ui/theme';
 import { VideoTile } from '../../ui/VideoTile';
 
 const TANK = ['Failure', '1 in the tank', '2 in the tank', '3 in the tank', '4+ in the tank'];
+
+/** "In the tank" buttons shrink on narrow phones (a Fold's cover screen) so weight and reps keep room. */
+function useTankCell() {
+  const { width } = useWindowDimensions();
+  return width < 370 ? 26 : 30;
+}
 
 /** What a set needs to win a bet: the Pace target for that exercise. */
 const betTarget = (p: Prescription) => (p.kind === 'lift' ? { w: p.w, reps: p.reps } : null);
@@ -105,6 +111,7 @@ function SetLine({ score, rir, bet, betResult, canBet, choosing, target, onChoos
 
 function SetRow({ i, j, draft, setDraft, wPh, rPh }: { i: number; j: number; draft: Draft; setDraft: (d: Draft) => void; wPh: string; rPh: string }) {
   const t = useTheme();
+  const cell = useTankCell();
   const row = draft.rows[i][j];
   const done = Math.round(num(row.r) ?? 0) > 0;
   const update = (patch: Partial<typeof row>) => {
@@ -122,7 +129,7 @@ function SetRow({ i, j, draft, setDraft, wPh, rPh }: { i: number; j: number; dra
           const on = row.rir === v;
           return (
             <Pressable key={v} onPress={() => { tap(); update({ rir: on ? null : v }); }} accessibilityRole="button" accessibilityLabel={`${v === 4 ? '4 or more' : v} reps left`} accessibilityState={{ selected: on }}
-              style={{ width: 30, height: 40, borderRadius: 10, backgroundColor: on ? t.accent : 'transparent', alignItems: 'center', justifyContent: 'center' }}>
+              style={{ width: cell, height: 40, borderRadius: 10, backgroundColor: on ? t.accent : 'transparent', alignItems: 'center', justifyContent: 'center' }}>
               <Text style={{ color: on ? t.accentInk : t.ink2, fontSize: 14, fontFamily: on ? F.bold : F.med }}>{v === 4 ? '4+' : v}</Text>
             </Pressable>
           );
@@ -152,6 +159,7 @@ function ExerciseCard({ ex, i, zone, p, draft, setDraft, live, slots, betting }:
   const [showHist, setShowHist] = useState(false);
   const [showTank, setShowTank] = useState(false);
   const [choosing, setChoosing] = useState<number | null>(null);
+  const cell = useTankCell();
   const video = <VideoTile compact name={ex.name} video={ctx.video(ex.name)} canEdit={!demo} />;
   const head = (right?: React.ReactNode) => (
     <Row gap={12} style={{ alignItems: 'flex-start' }}>
@@ -206,8 +214,8 @@ function ExerciseCard({ ex, i, zone, p, draft, setDraft, live, slots, betting }:
           <Txt v="label" style={{ flex: 1.25, textAlign: 'center' }}>lb</Txt>
           <Txt v="label" style={{ flex: 1, textAlign: 'center' }}>Reps</Txt>
           <Pressable onPress={() => { tap(); setShowTank(s => !s); }} accessibilityRole="button" accessibilityLabel="What does in the tank mean?" hitSlop={8}
-            style={{ width: 154, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
-            <Txt v="label">In the tank</Txt>
+            style={{ width: cell * 5 + 4, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
+            <Txt v="label" numberOfLines={1}>{cell < 30 ? 'Tank' : 'In the tank'}</Txt>
             <View style={{ width: 15, height: 15, borderRadius: 8, borderWidth: 1, borderColor: t.ink3, alignItems: 'center', justifyContent: 'center' }}><Text style={{ fontFamily: F.bold, fontSize: 9.5, color: t.ink3 }}>?</Text></View>
           </Pressable>
         </View>

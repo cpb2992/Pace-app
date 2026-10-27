@@ -45,7 +45,7 @@ adb shell am start -W -n $PKG/.MainActivity
 sleep 25
 { echo "alive: $(alive)"; focused; } > smoke/a-launch.txt
 adb exec-out screencap -p > smoke/a-today.png
-has "Rookie" && echo "today shows the rank" >> smoke/steps.txt
+has "How recovered are you\|Push day\|Steady day\|Recovery day" && echo "today shows recovery" >> smoke/steps.txt
 adb logcat -d -b crash > smoke/a-crash.txt
 
 # --- B: Train: log a set, finish, open the crate
@@ -55,11 +55,13 @@ sleep 6
 tap_label "Set 1 reps" 4 && sleep 1
 adb shell input text "9"
 sleep 1
-tap_label "^0 reps left\|" 4 && sleep 1
+# Close the keyboard first, or the tap lands on a keyboard key.
 hide_kb
+tap_label "^0 reps left\|" 4 && sleep 1
 adb exec-out screencap -p > smoke/b-train.png
 has "Bounties" && echo "train shows bounties and live points" >> smoke/steps.txt
-tap_label "Finish workout" 30 && sleep 5
+# Finish lives in the bar pinned above the tabs.
+TAP_MAXY=$((H * 9 / 10)) tap_label "Finish workout" 2 && sleep 5
 adb exec-out screencap -p > smoke/b-results.png
 has "Breakdown" && echo "results screen opened" >> smoke/steps.txt
 tap_label "^\|Spin the plate$" 6 && sleep 4
