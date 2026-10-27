@@ -1,0 +1,10 @@
+tapped 'Set 1 reps' at 113 478
+tapped '^0 reps left\|' at 148 478
+could not find 'Finish workout'
+could not find '^\|Spin the plate$'
+could not find '^\|Too easy$'
+alive after train: RUNNING
+coach setup shows
+settings shows the WHOOP setup
+WHOOP return handles a code safely
+alive at end: RUNNING
