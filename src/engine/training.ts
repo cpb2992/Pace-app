@@ -6,9 +6,9 @@ export const zoneOf = (v: number): Zone => (v >= 67 ? 'green' : v >= 34 ? 'yello
 export const isFree = (t: ExerciseType) => t === 'cardio' || t === 'circuit';
 
 export const ZONES: Record<ZoneOrUnknown, { label: string; head: string; sub: string }> = {
-  green: { label: 'Recovered', head: 'Push today', sub: 'Add weight where Pace says. Last set to failure.' },
-  yellow: { label: 'Moderate', head: "Train, don't test", sub: 'Match last time. Leave 2 reps in the tank.' },
-  red: { label: 'Low', head: 'Recover today', sub: 'Lighter and fewer sets, or easy cardio.' },
+  green: { label: 'Recovered', head: 'Push day', sub: 'Add weight where Pace says. Take the last set to failure.' },
+  yellow: { label: 'Moderate', head: 'Steady day', sub: 'Match last time and leave 2 reps in the tank.' },
+  red: { label: 'Low', head: 'Recovery day', sub: 'Go lighter with fewer sets, or swap in easy cardio.' },
   unknown: { label: 'No data', head: '', sub: '' },
 };
 

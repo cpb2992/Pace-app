@@ -8,7 +8,7 @@ import type { Exercise, ExerciseType, WorkoutDay } from '../../engine/types';
 import { key, letter, uid } from '../../engine/util';
 import { useApp } from '../../store/AppStore';
 import { Badge, Button, Card, CommitField, Confirm, Row, Screen, Txt } from '../../ui/components';
-import { useTheme } from '../../ui/theme';
+import { F, useTheme } from '../../ui/theme';
 import { VideoTile } from '../../ui/VideoTile';
 
 function Pills<T extends string | number | null>({ options, value, onChange }: { options: { label: string; value: T }[]; value: T; onChange: (v: T) => void }) {
@@ -20,7 +20,7 @@ function Pills<T extends string | number | null>({ options, value, onChange }: {
         return (
           <Pressable key={String(o.value)} onPress={() => onChange(o.value)} accessibilityRole="button" accessibilityState={{ selected: on }}
             style={{ paddingHorizontal: 11, paddingVertical: 7, borderRadius: 999, borderWidth: 1, borderColor: on ? t.accent : t.line, backgroundColor: on ? t.accentSoft : t.surface }}>
-            <Text style={{ color: on ? t.accent : t.ink, fontSize: 13.5, fontWeight: on ? '600' : '500' }}>{o.label}</Text>
+            <Text style={{ color: on ? t.accent : t.ink, fontSize: 13.5, fontFamily: on ? F.semi : F.med }}>{o.label}</Text>
           </Pressable>
         );
       })}

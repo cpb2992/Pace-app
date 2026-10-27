@@ -8,7 +8,7 @@ import { clone, letter, uid } from '../../engine/util';
 import type { Block } from '../../engine/types';
 import { useApp } from '../../store/AppStore';
 import { Badge, Button, Card, CommitField, Confirm, Grid, Row, Screen, Section, Segmented, Txt } from '../../ui/components';
-import { useTheme } from '../../ui/theme';
+import { F, useTheme } from '../../ui/theme';
 
 export default function ProgramScreen() {
   const { ctx, data, demo, mutate, today } = useApp();
@@ -32,13 +32,13 @@ export default function ProgramScreen() {
         <Card key={d.id} onPress={demo ? undefined : () => router.push({ pathname: '/program/[dayId]', params: { dayId: d.id, blockId: sel.id } })}>
           <Row>
             <View><Txt v="label">{d.dow != null ? `${DOWL[d.dow]}s` : 'Any day'}</Txt><Txt v="h2">{d.name}</Txt></View>
-            {demo ? null : <Txt v="body" color={t.accent} style={{ fontWeight: '500' }}>Edit</Txt>}
+            {demo ? null : <Txt v="body" color={t.accent} style={{ fontFamily: F.med }}>Edit</Txt>}
           </Row>
           <View style={{ gap: 10 }}>
             {d.exercises.map((ex, j) => (
               <Row key={ex.id} gap={12} style={{ justifyContent: 'flex-start' }}>
                 <Badge letter={letter(j)} />
-                <View style={{ flex: 1 }}><Txt v="body" style={{ fontWeight: '500' }}>{ex.name}</Txt><Txt v="sub">{rxText(ex)}</Txt></View>
+                <View style={{ flex: 1 }}><Txt v="body" style={{ fontFamily: F.med }}>{ex.name}</Txt><Txt v="sub">{rxText(ex)}</Txt></View>
                 {ctx.video(ex.name) ? <Svg width={16} height={16} viewBox="0 0 24 24"><Path d="M8 5v14l11-7z" fill={t.ink3} /></Svg> : null}
               </Row>
             ))}

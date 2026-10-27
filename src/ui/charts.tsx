@@ -2,7 +2,7 @@ import { View } from 'react-native';
 import Svg, { Circle, Line, Path, Rect, Text as SvgText } from 'react-native-svg';
 import { fmtShort } from '../engine/dates';
 import { zoneOf } from '../engine/training';
-import { useTheme, zoneColor } from './theme';
+import { F, useTheme, zoneColor } from './theme';
 
 export function RecoveryBars({ days, values }: { days: string[]; values: (number | null)[] }) {
   const t = useTheme();
@@ -14,7 +14,7 @@ export function RecoveryBars({ days, values }: { days: string[]; values: (number
           const y = T + ih * (1 - v / 100);
           return [
             <Line key={`l${v}`} x1={L} x2={W - 4} y1={y} y2={y} stroke={t.line} strokeWidth={1} strokeDasharray={v < 100 ? '3 3' : undefined} />,
-            <SvgText key={`t${v}`} x={L - 5} y={y + 3} fill={t.ink3} fontSize={10} textAnchor="end">{v}</SvgText>,
+            <SvgText fontFamily={F.med} key={`t${v}`} x={L - 5} y={y + 3} fill={t.ink3} fontSize={10} textAnchor="end">{v}</SvgText>,
           ];
         })}
         {values.map((v, i) => {
@@ -23,8 +23,8 @@ export function RecoveryBars({ days, values }: { days: string[]; values: (number
           const hh = Math.max(2, (ih * v) / 100);
           return <Rect key={i} x={x} y={T + ih - hh} width={w} height={hh} rx={1.5} fill={zoneColor(t, zoneOf(v)).fg} />;
         })}
-        <SvgText x={L} y={H - 4} fill={t.ink3} fontSize={10}>{fmtShort(days[0])}</SvgText>
-        <SvgText x={W - 4} y={H - 4} fill={t.ink3} fontSize={10} textAnchor="end">Today</SvgText>
+        <SvgText fontFamily={F.med} x={L} y={H - 4} fill={t.ink3} fontSize={10}>{fmtShort(days[0])}</SvgText>
+        <SvgText fontFamily={F.med} x={W - 4} y={H - 4} fill={t.ink3} fontSize={10} textAnchor="end">Today</SvgText>
       </Svg>
     </View>
   );
@@ -47,13 +47,13 @@ export function HrvLine({ days, values, base }: { days: string[]; values: (numbe
       <Svg width="100%" height="100%" viewBox={`0 0 ${W} ${H}`}>
         {[lo, hi].map(v => [
           <Line key={`l${v}`} x1={L} x2={W - 8} y1={Y(v)} y2={Y(v)} stroke={t.line} strokeWidth={1} />,
-          <SvgText key={`t${v}`} x={L - 5} y={Y(v) + 3} fill={t.ink3} fontSize={10} textAnchor="end">{v}</SvgText>,
+          <SvgText fontFamily={F.med} key={`t${v}`} x={L - 5} y={Y(v) + 3} fill={t.ink3} fontSize={10} textAnchor="end">{v}</SvgText>,
         ])}
         <Line x1={L} x2={W - 8} y1={Y(base)} y2={Y(base)} stroke={t.ink3} strokeWidth={1} strokeDasharray="4 3" />
         <Path d={d} stroke={t.accent} strokeWidth={2} fill="none" strokeLinejoin="round" strokeLinecap="round" />
         {e ? <Circle cx={X(e[0])} cy={Y(e[1])} r={4} fill={t.accent} stroke={t.surface} strokeWidth={2} /> : null}
-        <SvgText x={L} y={H - 4} fill={t.ink3} fontSize={10}>{fmtShort(days[0])}</SvgText>
-        <SvgText x={W - 8} y={H - 4} fill={t.ink3} fontSize={10} textAnchor="end">Today</SvgText>
+        <SvgText fontFamily={F.med} x={L} y={H - 4} fill={t.ink3} fontSize={10}>{fmtShort(days[0])}</SvgText>
+        <SvgText fontFamily={F.med} x={W - 8} y={H - 4} fill={t.ink3} fontSize={10} textAnchor="end">Today</SvgText>
       </Svg>
     </View>
   );

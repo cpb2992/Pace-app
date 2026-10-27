@@ -172,11 +172,12 @@ export const streakMult = (weeks: number) => (weeks >= 8 ? 1.5 : weeks >= 4 ? 1.
 
 // ---------- Loot ----------
 
-export const LOOT: Record<LootTier, { label: string; min: number; max: number }> = {
-  common: { label: 'Common', min: 50, max: 120 },
-  rare: { label: 'Rare', min: 150, max: 300 },
-  epic: { label: 'Epic', min: 400, max: 700 },
-  legendary: { label: 'Legendary', min: 1200, max: 2000 },
+/** The mystery plate after a workout lands on a competition plate: heavier plate, rarer drop. */
+export const LOOT: Record<LootTier, { label: string; kg: number; min: number; max: number }> = {
+  common: { label: 'Common', kg: 5, min: 50, max: 120 },
+  rare: { label: 'Rare', kg: 10, min: 150, max: 300 },
+  epic: { label: 'Epic', kg: 20, min: 400, max: 700 },
+  legendary: { label: 'Legendary', kg: 25, min: 1200, max: 2000 },
 };
 
 /** Crate odds. Quality is the share of sets done at the effort that pays most today; a PR helps too. */

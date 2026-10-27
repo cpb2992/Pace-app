@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Linking, Switch, TextInput, View } from 'react-native';
+import { Linking, TextInput, View } from 'react-native';
 import { parseProgramText, PROGRAM_PROMPT, TYPE_LABEL, validateProgram, type ParsedProgram } from '../engine/parse';
 import { rxText, VOICE } from '../engine/training';
 import { uid } from '../engine/util';
@@ -10,8 +10,8 @@ import { getClaudeKey } from '../services/secrets';
 import { connectWhoop, disconnectWhoop, getWhoopClient, setWhoopClient, WHOOP_REDIRECT } from '../services/whoop';
 import { useApp } from '../store/AppStore';
 import { ClaudeKeyForm } from '../ui/ClaudeKey';
-import { Button, Card, CommitField, Confirm, Row, Screen, Section, Segmented, TwoCol, Txt } from '../ui/components';
-import { useTheme } from '../ui/theme';
+import { Button, Card, CommitField, Confirm, List, Row, Screen, Section, Segmented, Toggle, TwoCol, Txt } from '../ui/components';
+import { F, useTheme } from '../ui/theme';
 
 const PRIVACY_URL = 'https://github.com/cpb2992/Pace-app/blob/main/PRIVACY.md';
 
@@ -41,7 +41,7 @@ function WhoopCard() {
     finally { setBusy(false); }
   };
   const disconnect = async () => { await disconnectWhoop(); await refreshWhoop(); setMsg('Disconnected. Your synced days stay in Pace.'); };
-  const field = { fontSize: 16, color: t.ink, backgroundColor: t.bg, borderColor: t.line, borderWidth: 1, borderRadius: 10, paddingHorizontal: 11, paddingVertical: 10 };
+  const field = { fontSize: 16, fontFamily: F.body, color: t.ink, backgroundColor: t.raised, borderRadius: 12, paddingHorizontal: 12, paddingVertical: 12 };
   const status = whoop.status;
   const nDays = Object.values(data.whoop).filter(d => d.src === 'api').length;
 
@@ -82,7 +82,7 @@ function WhoopCard() {
           </Row>
         </>
       )}
-      {msg ? <Txt v="body" style={{ fontWeight: '500' }}>{msg}</Txt> : whoop.msg ? <Txt v="fine">{whoop.msg}</Txt> : null}
+      {msg ? <Txt v="body" style={{ fontFamily: F.med }}>{msg}</Txt> : whoop.msg ? <Txt v="fine">{whoop.msg}</Txt> : null}
     </Card>
   );
 }
@@ -166,11 +166,11 @@ export default function Settings() {
         <Txt v="h2">Import a WHOOP export</Txt>
         <Txt v="fine">Live sync covers the last 30 days. For your full history: in WHOOP, More › App Settings › Data Export › Create Export, then pick the .zip WHOOP emails you.</Txt>
         <Button title="Choose export" onPress={importWhoop} disabled={demo} />
-        {whoopMsg ? <Txt v="body" style={{ fontWeight: '500' }}>{whoopMsg}</Txt> : null}
+        {whoopMsg ? <Txt v="body" style={{ fontFamily: F.med }}>{whoopMsg}</Txt> : null}
       </Card>
       {remindersSupported ? (
         <Card>
-          <Row><View style={{ flex: 1 }}><Txt v="h3">Morning reminder</Txt><Txt v="fine">A nudge at {s.reminder.hour}:{String(s.reminder.minute).padStart(2, '0')} to check your recovery.</Txt></View><Switch value={s.reminder.on} onValueChange={toggleReminder} disabled={demo} /></Row>
+          <Row><View style={{ flex: 1 }}><Txt v="h3">Morning reminder</Txt><Txt v="fine">A nudge at {s.reminder.hour}:{String(s.reminder.minute).padStart(2, '0')} to check your recovery.</Txt></View><Toggle value={s.reminder.on} onValueChange={toggleReminder} disabled={demo} /></Row>
           {remMsg ? <Txt v="fine">{remMsg}</Txt> : null}
         </Card>
       ) : null}
@@ -180,9 +180,9 @@ export default function Settings() {
         <Txt v="h2">Paste a new block from {s.coach}</Txt>
         <Txt v="fine">Copy every workout from the coach app and paste it here.</Txt>
         <TextInput value={progText} onChangeText={setProgText} multiline placeholder={'Upper\nA: Close Grip Bench Press 3x10-12\nB: Wide Lat Pull Down 3x10-12'} placeholderTextColor={t.ink3}
-          style={{ minHeight: 140, textAlignVertical: 'top', fontSize: 16, color: t.ink, backgroundColor: t.bg, borderColor: t.line, borderWidth: 1, borderRadius: 10, padding: 11 }} />
+          style={{ minHeight: 140, textAlignVertical: 'top', fontSize: 16, fontFamily: F.body, color: t.ink, backgroundColor: t.raised, borderRadius: 12, padding: 12 }} />
         <Button kind="primary" title={reading ? 'Reading…' : 'Read program'} onPress={readProgram} disabled={reading || demo} />
-        {progMsg ? <Txt v="body" style={{ fontWeight: '500' }}>{progMsg}</Txt> : null}
+        {progMsg ? <Txt v="body" style={{ fontFamily: F.med }}>{progMsg}</Txt> : null}
         {parsed ? <>
           {parsed.days.map((d, di) => (
             <View key={di} style={{ borderWidth: 1, borderColor: t.line, borderRadius: 12, padding: 12, gap: 6 }}>
@@ -198,7 +198,7 @@ export default function Settings() {
         <Txt v="h2">Import workout history</Txt>
         <Txt v="fine">A CSV with date, exercise, weight and reps. RPE or RIR columns are used if present.</Txt>
         <Button title="Choose CSV" onPress={importHistory} disabled={demo} />
-        {histMsg ? <Txt v="body" style={{ fontWeight: '500' }}>{histMsg}</Txt> : null}
+        {histMsg ? <Txt v="body" style={{ fontFamily: F.med }}>{histMsg}</Txt> : null}
       </Card>
 
       </>} right={<>
@@ -206,7 +206,7 @@ export default function Settings() {
       <Card>
         <Txt v="h2">AI coach</Txt>
         <ClaudeKeyForm />
-        <Row><View style={{ flex: 1 }}><Txt v="h3">Read replies out loud</Txt><Txt v="fine">Hear the coach between sets.</Txt></View><Switch value={s.speak} onValueChange={v => mutate(d => { d.settings.speak = v; })} disabled={demo} /></Row>
+        <Row><View style={{ flex: 1 }}><Txt v="h3">Read replies out loud</Txt><Txt v="fine">Hear the coach between sets.</Txt></View><Toggle value={s.speak} onValueChange={v => mutate(d => { d.settings.speak = v; })} disabled={demo} /></Row>
       </Card>
       <Card>
         <Txt v="h2">Coach voice</Txt>
@@ -223,19 +223,29 @@ export default function Settings() {
 
       <Section>Points</Section>
       <Card>
-        <Row><View style={{ flex: 1 }}><Txt v="h3">Points, crits and loot</Txt><Txt v="fine">Turn the game off and Pace goes back to plain logging.</Txt></View><Switch value={s.game} onValueChange={v => mutate(d => { d.settings.game = v; })} disabled={demo} /></Row>
-        {s.game ? (
-          <View style={{ gap: 4 }}>
-            <Txt v="fine">•  Every rep is 10 points. Heavier than last time ×1.25.</Txt>
-            <Txt v="fine">•  Effort pays by recovery: failure on green days (1 rep left on barbell lifts), 2 left on yellow, 3 left on red. Coasting barely scores.</Txt>
-            <Txt v="fine">•  Any set can crit ×2, ×3 or hit a ×5 jackpot. Harder sets get better odds.</Txt>
-            <Txt v="fine">•  PRs +150, rep records +60, beating last time +40, plus daily bounties.</Txt>
-            <Txt v="fine">•  Bet up to 3 sets a workout, double or nothing. No bets on red days.</Txt>
-            <Txt v="fine">•  A loot crate after every workout. Weekly streaks multiply up to ×1.5.</Txt>
-            <Txt v="fine">•  Sleep, check-ins and respecting red days earn points too.</Txt>
-          </View>
-        ) : null}
+        <Row><View style={{ flex: 1, gap: 2 }}><Txt v="h3">Points and rewards</Txt><Txt v="fine">Off turns Pace back into a plain log.</Txt></View><Toggle value={s.game} onValueChange={v => mutate(d => { d.settings.game = v; })} disabled={demo} /></Row>
       </Card>
+      {s.game ? (
+        <List>
+          {([
+            ['Every rep', '10 points'],
+            ['Heavier than last time', '×1.25'],
+            ['Effort that fits your recovery', 'up to ×2'],
+            ['Crits on any set', '×2, ×3 or ×5'],
+            ['PR, rep record, beat last time', '+150, +60, +40'],
+            ['Daily bounties', '+50 to +200'],
+            ['Double or nothing', '3 bets a workout'],
+            ['Mystery plate', 'after every workout'],
+            ['Weekly streak', 'up to ×1.5'],
+            ['Sleep, check-ins, red-day rest', '+10 to +60'],
+          ] as const).map(([k, v]) => (
+            <Row key={k} style={{ paddingVertical: 12, paddingHorizontal: 14 }}>
+              <Txt v="body" style={{ flex: 1 }}>{k}</Txt>
+              <Txt v="sub" style={{ fontFamily: F.semi }} color={t.xp}>{v}</Txt>
+            </Row>
+          ))}
+        </List>
+      ) : null}
 
       <Section>Appearance</Section>
       <Card>
@@ -253,7 +263,7 @@ export default function Settings() {
           : <Button kind="dangerLink" title="Erase all data" onPress={() => setConfirmErase(true)} />}
       </Card>
       </>} />
-      <Txt v="label" style={{ textAlign: 'center', marginTop: 8 }}>Pace 1.1</Txt>
+      <Txt v="label" style={{ textAlign: 'center', marginTop: 8 }}>Pace 1.2</Txt>
     </Screen>
   );
 }

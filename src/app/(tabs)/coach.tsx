@@ -1,7 +1,7 @@
 import * as Speech from 'expo-speech';
 import { useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useMemo, useRef, useState, type ComponentRef } from 'react';
-import { Animated, KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import { Animated, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { bountiesToday } from '../../engine/game';
 import { applyCoachReply, describeNudge } from '../../engine/prompt';
@@ -15,7 +15,7 @@ import { useApp, useDayIdx } from '../../store/AppStore';
 import { ClaudeKeyForm } from '../../ui/ClaudeKey';
 import { Button, Card, Logo, success, tap, Txt } from '../../ui/components';
 import { Icon } from '../../ui/icons';
-import { radius, useTheme } from '../../ui/theme';
+import { F, radius, useTheme } from '../../ui/theme';
 
 const STARTERS = [
   ['Today’s game plan', 'Give me today’s game plan, set by set.'],
@@ -41,24 +41,37 @@ function Thinking() {
   );
 }
 
-function Bubble({ m }: { m: CoachMsg }) {
+/** Your messages sit in bubbles; the coach writes on the page, like a note from a coach. */
+function Bubble({ m, lead }: { m: CoachMsg; lead: boolean }) {
   const t = useTheme();
-  const me = m.role === 'me';
-  return (
-    <View style={{ alignSelf: me ? 'flex-end' : 'flex-start', maxWidth: '88%', gap: 6 }}>
-      <View style={{ backgroundColor: me ? t.accent : t.surface, borderColor: me ? t.accent : t.line, borderWidth: 1, borderRadius: 18, borderBottomRightRadius: me ? 6 : 18, borderBottomLeftRadius: me ? 18 : 6, paddingHorizontal: 14, paddingVertical: 10 }}>
-        <Text selectable style={{ color: me ? t.accentInk : t.ink, fontSize: 15.5, lineHeight: 22 }}>{m.text}</Text>
+  if (m.role === 'me') {
+    return (
+      <View style={{ alignSelf: 'flex-end', maxWidth: '84%', backgroundColor: t.raised, borderRadius: 20, borderBottomRightRadius: 6, paddingHorizontal: 15, paddingVertical: 11 }}>
+        <Text selectable style={{ color: t.ink, fontFamily: F.body, fontSize: 16, lineHeight: 22 }}>{m.text}</Text>
       </View>
-      {m.changes?.length ? (
-        <View style={{ gap: 4 }}>
-          {m.changes.map(c => (
-            <View key={c} style={{ flexDirection: 'row', alignItems: 'center', gap: 6, alignSelf: 'flex-start', paddingHorizontal: 9, paddingVertical: 4, borderRadius: 999, backgroundColor: t.accentSoft }}>
-              <Icon name={c.startsWith('Remembered') || c.startsWith('Forgot') ? 'memory' : 'check'} size={13} color={t.accent} width={2} />
-              <Text style={{ color: t.accent, fontSize: 12.5, fontWeight: '600' }}>{c}</Text>
-            </View>
-          ))}
-        </View>
-      ) : null}
+    );
+  }
+  return (
+    <View style={{ flexDirection: 'row', gap: 10, alignItems: 'flex-start', paddingRight: 12 }}>
+      <View style={{ width: 28, height: 28, borderRadius: 14, backgroundColor: lead ? t.raised : 'transparent', alignItems: 'center', justifyContent: 'center', marginTop: 1 }}>
+        {lead ? <Logo size={15} color={t.ink} /> : null}
+      </View>
+      <View style={{ flex: 1, gap: 10 }}>
+        <Text selectable style={{ color: t.ink, fontFamily: F.body, fontSize: 16, lineHeight: 23 }}>{m.text}</Text>
+        {m.changes?.length ? (
+          <View style={{ gap: 6 }}>
+            {m.changes.map(c => {
+              const memo = c.startsWith('Remembered') || c.startsWith('Forgot');
+              return (
+                <View key={c} style={{ flexDirection: 'row', alignItems: 'center', gap: 7, alignSelf: 'flex-start', paddingHorizontal: 10, paddingVertical: 6, borderRadius: radius.pill, backgroundColor: memo ? t.raised : t.goSoft }}>
+                  <Icon name={memo ? 'memory' : 'check'} size={14} color={memo ? t.ink2 : t.go} width={2} />
+                  <Text style={{ color: memo ? t.ink2 : t.go, fontSize: 13, fontFamily: F.semi }}>{c}</Text>
+                </View>
+              );
+            })}
+          </View>
+        ) : null}
+      </View>
     </View>
   );
 }
@@ -168,21 +181,20 @@ export default function CoachScreen() {
 
   const shown = `${text}${interim ? `${text ? ' ' : ''}${interim}` : ''}`;
   const header = (
-    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 16, paddingTop: insets.top + 10, paddingBottom: 10, borderBottomWidth: 1, borderBottomColor: t.line, backgroundColor: t.bg }}>
-      <Logo size={22} color={t.accent} />
-      <View style={{ flex: 1 }}>
-        <Txt v="h2">Coach</Txt>
-        <Txt v="label">{key ? `Knows your WHOOP, sets and ${data.settings.coach}’s program` : 'Talk to Pace about your training'}</Txt>
+    <View style={{ flexDirection: 'row', alignItems: 'flex-end', gap: 8, paddingHorizontal: 18, paddingTop: insets.top + 16, paddingBottom: 12, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: t.line, backgroundColor: t.bg }}>
+      <View style={{ flex: 1, gap: 2 }}>
+        <Txt v="title">Coach</Txt>
+        <Txt v="sub" numberOfLines={1}>{key ? `Reads your WHOOP, your sets and ${data.settings.coach}’s plan` : 'Talk training with Pace'}</Txt>
       </View>
       {key ? (
         <>
           <Pressable onPress={() => { tap(); if (data.settings.speak) Speech.stop().catch(() => {}); mutate(d => { d.settings.speak = !d.settings.speak; }); }} hitSlop={8} accessibilityRole="switch" accessibilityState={{ checked: data.settings.speak }} accessibilityLabel="Read replies out loud"
-            style={{ width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center', backgroundColor: data.settings.speak ? t.accentSoft : t.fill }}>
-            <Icon name={data.settings.speak ? 'speaker' : 'speakerOff'} size={20} color={data.settings.speak ? t.accent : t.ink2} />
+            style={{ width: 42, height: 42, borderRadius: 21, alignItems: 'center', justifyContent: 'center', backgroundColor: data.settings.speak ? t.accent : t.raised }}>
+            <Icon name={data.settings.speak ? 'speaker' : 'speakerOff'} size={20} color={data.settings.speak ? t.accentInk : t.ink2} />
           </Pressable>
           <Pressable onPress={() => { tap(); setShowMemory(s => !s); }} hitSlop={8} accessibilityRole="button" accessibilityLabel="What Pace remembers"
-            style={{ width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center', backgroundColor: showMemory ? t.accentSoft : t.fill }}>
-            <Icon name="memory" size={20} color={showMemory ? t.accent : t.ink2} />
+            style={{ width: 42, height: 42, borderRadius: 21, alignItems: 'center', justifyContent: 'center', backgroundColor: showMemory ? t.accent : t.raised }}>
+            <Icon name="memory" size={20} color={showMemory ? t.accentInk : t.ink2} />
           </Pressable>
         </>
       ) : null}
@@ -194,10 +206,10 @@ export default function CoachScreen() {
     return (
       <View style={{ flex: 1, backgroundColor: t.bg }}>
         {header}
-        <ScrollView contentContainerStyle={{ padding: 16, gap: 12 }} keyboardShouldPersistTaps="handled">
-          <Card>
-            <Txt v="h2">Turn on your coach</Txt>
-            <Txt v="sub">Ask anything, give feedback after a set, or tell it what hurts. It reads your WHOOP recovery, every set you’ve logged and {data.settings.coach}’s program, remembers what matters, and moves your next targets when you say a lift felt off.</Txt>
+        <ScrollView contentContainerStyle={{ padding: 18, gap: 14 }} keyboardShouldPersistTaps="handled">
+          <Card style={{ borderRadius: radius.panel, padding: 18, gap: 14 }}>
+            <Txt v="display" style={{ fontSize: 32, lineHeight: 34 }}>Turn on your coach</Txt>
+            <Txt v="sub">{`Ask anything, give feedback after a set, or say what hurts. It reads your recovery, every set you’ve logged and ${data.settings.coach}’s plan, remembers what matters, and moves next time’s targets when a lift felt off.`}</Txt>
             <ClaudeKeyForm onChange={setKey} />
           </Card>
         </ScrollView>
@@ -209,16 +221,16 @@ export default function CoachScreen() {
     <KeyboardAvoidingView behavior="padding" style={{ flex: 1, backgroundColor: t.bg }}>
       {header}
       <ScrollView ref={scroll} onContentSizeChange={() => scroll.current?.scrollToEnd({ animated: true })} keyboardShouldPersistTaps="handled"
-        contentContainerStyle={{ padding: 16, gap: 12, flexGrow: 1, justifyContent: msgs.length ? 'flex-start' : 'flex-end' }}>
+        contentContainerStyle={{ paddingHorizontal: 18, paddingVertical: 18, gap: 18, flexGrow: 1, justifyContent: msgs.length ? 'flex-start' : 'flex-end' }}>
         {showMemory ? <Memory onClose={() => setShowMemory(false)} /> : null}
         {msgs.length ? null : (
-          <View style={{ gap: 6, paddingBottom: 8 }}>
-            <Txt v="h2">What’s on your mind?</Txt>
-            <Txt v="sub">Ask for today’s plan, tell Pace how a lift felt, or say what hurts. Feedback changes your next targets.</Txt>
+          <View style={{ gap: 8, paddingBottom: 4 }}>
+            <Txt v="display" style={{ fontSize: 34, lineHeight: 36 }}>What’s on your mind?</Txt>
+            <Txt v="sub">Ask for today’s plan, say how a lift felt, or tell it what hurts. Feedback changes your next targets.</Txt>
           </View>
         )}
-        {msgs.map(m => <Bubble key={m.id} m={m} />)}
-        {busy ? <View style={{ alignSelf: 'flex-start', backgroundColor: t.surface, borderColor: t.line, borderWidth: 1, borderRadius: 18, borderBottomLeftRadius: 6, paddingHorizontal: 14, paddingVertical: 6 }}><Thinking /></View> : null}
+        {msgs.map((m, i) => <Bubble key={m.id} m={m} lead={i === 0 || msgs[i - 1].role !== m.role} />)}
+        {busy ? <View style={{ flexDirection: 'row', gap: 10, alignItems: 'center' }}><View style={{ width: 28, height: 28, borderRadius: 14, backgroundColor: t.raised, alignItems: 'center', justifyContent: 'center' }}><Logo size={15} color={t.ink} /></View><Thinking /></View> : null}
         {err ? (
           <View style={{ gap: 8, padding: 12, borderRadius: radius.tile, backgroundColor: t.stopSoft }}>
             <Txt v="body" color={t.stop}>{err.msg}</Txt>
@@ -229,21 +241,21 @@ export default function CoachScreen() {
       </ScrollView>
       {!busy && (!msgs.length || msgs[msgs.length - 1]?.role === 'coach') ? (
         <ScrollView horizontal showsHorizontalScrollIndicator={false} keyboardShouldPersistTaps="handled" contentContainerStyle={{ gap: 8, paddingHorizontal: 16, paddingBottom: 8 }} style={{ flexGrow: 0 }}>
-          {STARTERS.map(([label, q]) => <Button key={label} small kind="tint" title={label} onPress={() => send(q)} disabled={demo} />)}
+          {STARTERS.map(([label, q]) => <Button key={label} small title={label} onPress={() => send(q)} disabled={demo} />)}
         </ScrollView>
       ) : null}
-      <View style={{ flexDirection: 'row', alignItems: 'flex-end', gap: 8, paddingHorizontal: 12, paddingTop: 8, paddingBottom: 10, borderTopWidth: 1, borderTopColor: t.line, backgroundColor: t.surface }}>
+      <View style={{ flexDirection: 'row', alignItems: 'flex-end', gap: 8, paddingHorizontal: 14, paddingTop: 8, paddingBottom: 12, backgroundColor: t.bg }}>
         {canSpeak ? (
           <Pressable onPress={listen} accessibilityRole="button" accessibilityLabel={listening ? 'Stop listening' : 'Talk to the coach'}
-            style={{ width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', backgroundColor: listening ? t.stop : t.fill }}>
+            style={{ width: 46, height: 46, borderRadius: 23, alignItems: 'center', justifyContent: 'center', backgroundColor: listening ? t.stop : t.raised }}>
             <Icon name={listening ? 'stop' : 'mic'} size={21} color={listening ? '#fff' : t.ink} width={2} />
           </Pressable>
         ) : null}
         <TextInput ref={input} value={shown} onChangeText={v => { setText(v); setInterim(''); }} placeholder={listening ? 'Listening…' : 'Message your coach'} placeholderTextColor={t.ink3} multiline
           accessibilityLabel="Message your coach" editable={!demo}
-          style={{ flex: 1, minHeight: 44, maxHeight: 130, fontSize: 16, color: t.ink, backgroundColor: t.bg, borderColor: t.line, borderWidth: 1, borderRadius: 22, paddingHorizontal: 14, paddingTop: 11, paddingBottom: 11 }} />
+          style={{ flex: 1, minHeight: 46, maxHeight: 130, fontSize: 16, fontFamily: F.body, color: t.ink, backgroundColor: t.raised, borderRadius: 23, paddingHorizontal: 16, paddingTop: 12, paddingBottom: 12 }} />
         <Pressable onPress={() => { tap(); send(shown); }} disabled={!shown.trim() || busy || demo} accessibilityRole="button" accessibilityLabel="Send"
-          style={{ width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', backgroundColor: shown.trim() && !busy ? t.accent : t.fill }}>
+          style={{ width: 46, height: 46, borderRadius: 23, alignItems: 'center', justifyContent: 'center', backgroundColor: shown.trim() && !busy ? t.accent : t.raised }}>
           <Icon name="up" size={21} color={shown.trim() && !busy ? t.accentInk : t.ink3} width={2.2} />
         </Pressable>
       </View>

@@ -1,16 +1,45 @@
 import { Tabs } from 'expo-router';
 import type { ColorValue } from 'react-native';
 import Svg, { Circle, Path, Rect } from 'react-native-svg';
-import { useTheme } from '../../ui/theme';
+import { F, useTheme } from '../../ui/theme';
 
-type IconProps = { color: ColorValue };
-const stroke = { fill: 'none', strokeWidth: 1.8, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const };
+type IconProps = { color: ColorValue; focused: boolean };
+const line = (focused: boolean) => ({ fill: 'none', strokeWidth: focused ? 2.2 : 1.8, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const });
+
 const Icon = {
-  today: ({ color }: IconProps) => <Svg width={24} height={24} viewBox="0 0 24 24"><Circle cx={12} cy={12} r={8.5} stroke={color} {...stroke} /><Path d="M12 7.5V12l3 2" stroke={color} {...stroke} /></Svg>,
-  train: ({ color }: IconProps) => <Svg width={24} height={24} viewBox="0 0 24 24"><Path d="M3 12h18M6 8.5v7M8.8 7v10M15.2 7v10M18 8.5v7" stroke={color} {...stroke} /></Svg>,
-  program: ({ color }: IconProps) => <Svg width={24} height={24} viewBox="0 0 24 24"><Rect x={4} y={4} width={16} height={16} rx={3} stroke={color} {...stroke} /><Path d="M8 9h8M8 12.5h8M8 16h5" stroke={color} {...stroke} /></Svg>,
-  trends: ({ color }: IconProps) => <Svg width={24} height={24} viewBox="0 0 24 24"><Path d="M4 19V5M4 19h16M8 15l3.5-4 3 2.5L19 8" stroke={color} {...stroke} /></Svg>,
-  coach: ({ color }: IconProps) => <Svg width={24} height={24} viewBox="0 0 24 24"><Path d="M5 5.5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-7.5L7 21v-3.5H5a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2z" stroke={color} {...stroke} /><Path d="M8 11.5h.01M12 11.5h.01M16 11.5h.01" stroke={color} {...stroke} strokeWidth={2.6} /></Svg>,
+  // Today is the Pace mark itself.
+  today: ({ color, focused }: IconProps) => (
+    <Svg width={26} height={26} viewBox="0 0 24 24">
+      <Path d="M17.6 6.6A8 8 0 1 0 20 12" stroke={color} {...line(focused)} />
+      <Circle cx={12} cy={12} r={focused ? 3 : 2.4} fill={color} />
+    </Svg>
+  ),
+  train: ({ color, focused }: IconProps) => (
+    <Svg width={26} height={26} viewBox="0 0 24 24">
+      <Path d="M2.5 12h19" stroke={color} {...line(focused)} />
+      <Rect x={5} y={7.5} width={2.6} height={9} rx={1} fill={focused ? color : 'none'} stroke={color} strokeWidth={focused ? 2.2 : 1.8} />
+      <Rect x={16.4} y={7.5} width={2.6} height={9} rx={1} fill={focused ? color : 'none'} stroke={color} strokeWidth={focused ? 2.2 : 1.8} />
+      <Path d="M9.5 9v6M14.5 9v6" stroke={color} {...line(focused)} />
+    </Svg>
+  ),
+  coach: ({ color, focused }: IconProps) => (
+    <Svg width={26} height={26} viewBox="0 0 24 24">
+      <Path d="M5 5h14a2 2 0 0 1 2 2v8.5a2 2 0 0 1-2 2h-7L7 21v-3.5H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z" stroke={color} {...line(focused)} fill={focused ? color : 'none'} />
+    </Svg>
+  ),
+  trends: ({ color, focused }: IconProps) => (
+    <Svg width={26} height={26} viewBox="0 0 24 24">
+      <Rect x={4} y={13} width={3.6} height={7} rx={1.2} stroke={color} strokeWidth={focused ? 2.2 : 1.8} fill={focused ? color : 'none'} />
+      <Rect x={10.2} y={8.5} width={3.6} height={11.5} rx={1.2} stroke={color} strokeWidth={focused ? 2.2 : 1.8} fill={focused ? color : 'none'} />
+      <Rect x={16.4} y={4} width={3.6} height={16} rx={1.2} stroke={color} strokeWidth={focused ? 2.2 : 1.8} fill={focused ? color : 'none'} />
+    </Svg>
+  ),
+  program: ({ color, focused }: IconProps) => (
+    <Svg width={26} height={26} viewBox="0 0 24 24">
+      <Rect x={4.5} y={3.5} width={15} height={17} rx={3} stroke={color} {...line(focused)} />
+      <Path d="M8.5 8.5h7M8.5 12h7M8.5 15.5h4" stroke={color} {...line(focused)} />
+    </Svg>
+  ),
 };
 
 export default function TabLayout() {
@@ -19,10 +48,10 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: t.accent,
+        tabBarActiveTintColor: t.ink,
         tabBarInactiveTintColor: t.ink3,
-        tabBarStyle: { backgroundColor: t.surface, borderTopColor: t.line },
-        tabBarLabelStyle: { fontSize: 10.5, fontWeight: '500' },
+        tabBarStyle: { backgroundColor: t.bg, borderTopColor: t.line, borderTopWidth: 0.5 },
+        tabBarLabelStyle: { fontSize: 11, fontFamily: F.med, marginTop: 1 },
         sceneStyle: { backgroundColor: t.bg },
       }}>
       <Tabs.Screen name="index" options={{ title: 'Today', tabBarIcon: Icon.today }} />

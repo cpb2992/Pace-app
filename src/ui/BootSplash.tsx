@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Animated, Easing, StyleSheet, Text, View } from 'react-native';
 import { Logo } from './components';
+import { F } from './theme';
 
 const MIN_SHOW_MS = 900;
 
@@ -34,8 +35,8 @@ export function BootSplash({ ready }: { ready: boolean }) {
   return (
     <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, styles.wrap, { opacity: fade }]} accessibilityLabel="Pace is loading">
       <View style={styles.center}>
-        <Logo size={84} color="#FFFFFF" />
-        <Text style={styles.word}>PACE</Text>
+        <Logo size={76} color="#F4F4F2" />
+        <Text style={styles.word}>Pace</Text>
         <View style={styles.track}><Animated.View style={[styles.fill, { width }]} /></View>
       </View>
     </Animated.View>
@@ -45,7 +46,7 @@ export function BootSplash({ ready }: { ready: boolean }) {
 const styles = StyleSheet.create({
   wrap: { backgroundColor: '#000000', alignItems: 'center', justifyContent: 'center', zIndex: 100 },
   center: { alignItems: 'center', gap: 14 },
-  word: { color: '#FFFFFF', fontSize: 22, fontWeight: '600', letterSpacing: 7, marginLeft: 7 },
-  track: { marginTop: 30, width: 128, height: 3, borderRadius: 2, backgroundColor: 'rgba(255,255,255,0.22)', overflow: 'hidden' },
-  fill: { height: '100%', backgroundColor: '#FFFFFF', borderRadius: 2 },
+  word: { color: '#F4F4F2', fontSize: 34, fontFamily: F.num, letterSpacing: 0.5 },
+  track: { marginTop: 26, width: 112, height: 3, borderRadius: 2, backgroundColor: 'rgba(244,244,242,0.18)', overflow: 'hidden' },
+  fill: { height: '100%', backgroundColor: '#F4F4F2', borderRadius: 2 },
 });

@@ -1,5 +1,6 @@
 import type { ColorValue } from 'react-native';
-import Svg, { Circle, Path, Rect } from 'react-native-svg';
+import Svg, { Circle, Path, Text as SvgText } from 'react-native-svg';
+import { F } from './theme';
 
 const line = { fill: 'none', strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const };
 
@@ -34,31 +35,21 @@ export function Icon({ name, size = 22, color, width = 1.8, fill }: { name: Icon
   );
 }
 
-/** A closed or burst-open loot crate. */
-export function CrateArt({ size = 120, color, lid, open }: { size?: number; color: string; lid: string; open?: boolean }) {
+/**
+ * A competition bumper plate seen face-on: colored disc, raised collar, steel hub.
+ * `label` is stamped on the plate ("20", or "?" before the spin).
+ */
+export function PlateArt({ size = 140, color, hub, ink, label, unit = 'KG' }: { size?: number; color: string; hub: string; ink: string; label: string; unit?: string }) {
   return (
-    <Svg width={size} height={size} viewBox="0 0 120 120">
-      {open ? (
-        <>
-          {[0, 1, 2, 3, 4, 5, 6, 7].map(i => {
-            const a = (i / 8) * Math.PI * 2 - Math.PI / 2;
-            return <Path key={i} d={`M${60 + Math.cos(a) * 30} ${54 + Math.sin(a) * 30}L${60 + Math.cos(a) * 54} ${54 + Math.sin(a) * 54}`} stroke={color} strokeWidth={4} strokeLinecap="round" opacity={0.85} />;
-          })}
-          <Circle cx={60} cy={54} r={22} fill={color} opacity={0.18} />
-        </>
-      ) : null}
-      <Rect x={22} y={56} width={76} height={46} rx={7} fill={color} />
-      <Rect x={22} y={56} width={76} height={46} rx={7} fill="#000" opacity={0.12} />
-      <Rect x={54} y={56} width={12} height={46} fill={lid} opacity={0.9} />
-      {open ? (
-        <Rect x={18} y={28} width={84} height={18} rx={6} fill={color} transform="rotate(-18 30 46)" />
-      ) : (
-        <>
-          <Rect x={18} y={42} width={84} height={18} rx={6} fill={color} />
-          <Rect x={54} y={42} width={12} height={18} fill={lid} />
-          <Rect x={52} y={62} width={16} height={12} rx={3} fill={lid} />
-        </>
-      )}
+    <Svg width={size} height={size} viewBox="0 0 140 140">
+      <Circle cx={70} cy={70} r={68} fill={color} />
+      <Circle cx={70} cy={70} r={60} fill="none" stroke="#000" strokeOpacity={0.14} strokeWidth={2} />
+      <Circle cx={70} cy={70} r={30} fill="#000" fillOpacity={0.16} />
+      <Circle cx={70} cy={70} r={20} fill={hub} />
+      <Circle cx={70} cy={70} r={20} fill="none" stroke="#000" strokeOpacity={0.25} strokeWidth={1.5} />
+      <Circle cx={70} cy={70} r={8} fill="#000" fillOpacity={0.55} />
+      <SvgText x={70} y={46} fill={ink} fontSize={24} fontFamily={F.num} textAnchor="middle">{label}</SvgText>
+      <SvgText x={70} y={110} fill={ink} fillOpacity={0.8} fontSize={12} fontFamily={F.numBold} textAnchor="middle" letterSpacing={1.5}>{unit}</SvgText>
     </Svg>
   );
 }

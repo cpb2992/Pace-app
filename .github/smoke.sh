@@ -58,15 +58,15 @@ sleep 1
 tap_label "^0 reps left\|" 4 && sleep 1
 hide_kb
 adb exec-out screencap -p > smoke/b-train.png
-has "Points this workout" && echo "train shows live points" >> smoke/steps.txt
+has "Bounties" && echo "train shows bounties and live points" >> smoke/steps.txt
 tap_label "Finish workout" 30 && sleep 5
 adb exec-out screencap -p > smoke/b-results.png
 has "Breakdown" && echo "results screen opened" >> smoke/steps.txt
-tap_label "^\|Open crate$" 6 && sleep 4
+tap_label "^\|Spin the plate$" 6 && sleep 4
 adb exec-out screencap -p > smoke/b-crate.png
-has "Added to your points\|Jackpot\|Epic drop" && echo "crate opened" >> smoke/steps.txt
+has "Added to your points\|rarest plate\|Effort pays" && echo "mystery plate spun" >> smoke/steps.txt
 tap_label "^\|Too easy$" 10 && sleep 2
-has "changed your next targets" && echo "feedback queued a change" >> smoke/steps.txt
+has "Next time" && echo "feedback queued a change" >> smoke/steps.txt
 echo "alive after train: $(alive)" >> smoke/steps.txt
 adb logcat -d -v time > smoke/b-logcat.txt
 adb logcat -d -b crash > smoke/b-crash.txt

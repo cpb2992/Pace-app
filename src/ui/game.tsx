@@ -3,7 +3,7 @@ import { Animated, Easing, Text, View } from 'react-native';
 import { LOOT, type Crit } from '../engine/game';
 import type { LootTier } from '../engine/types';
 import { Icon, ShieldArt } from './icons';
-import { useTheme, type Theme } from './theme';
+import { F, numStyle, useTheme, type Theme } from './theme';
 
 export const fmtPts = (n: number, sign = false) => {
   const s = Math.abs(Math.round(n)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -30,7 +30,8 @@ export function useCountUp(target: number, ms = 1100, run = true) {
   return shown;
 }
 
-export const tierColor = (t: Theme, tier: LootTier) => (tier === 'legendary' ? t.legendary : tier === 'epic' ? t.epic : tier === 'rare' ? t.rare : t.ink2);
+/** Plate colors: 5 kg white, 10 kg green, 20 kg blue, 25 kg red. */
+export const tierColor = (t: Theme, tier: LootTier) => (tier === 'legendary' ? t.legendary : tier === 'epic' ? t.epic : tier === 'rare' ? t.rare : t.ink);
 export const critColor = (t: Theme, c: Crit) => (c === 5 ? t.legendary : t.crit);
 
 export function RankBadge({ level, size = 54 }: { level: number; size?: number }) {
@@ -38,7 +39,7 @@ export function RankBadge({ level, size = 54 }: { level: number; size?: number }
   return (
     <View style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
       <View style={{ position: 'absolute' }}><ShieldArt size={size} color={t.xp} fill={t.xpSoft} /></View>
-      <Text style={{ color: t.xp, fontWeight: '800', fontSize: size * 0.32, marginTop: -size * 0.04, fontVariant: ['tabular-nums'] }}>{level}</Text>
+      <Text style={[numStyle(size * 0.38, t.xp), { marginTop: -size * 0.05 }]}>{level}</Text>
     </View>
   );
 }
@@ -60,20 +61,20 @@ export function CritPill({ crit, small }: { crit: Crit; small?: boolean }) {
   if (crit === 1) return null;
   const c = critColor(t, crit);
   return (
-    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 3, paddingHorizontal: small ? 6 : 8, paddingVertical: small ? 1 : 3, borderRadius: 999, backgroundColor: crit === 5 ? t.xpSoft : t.critSoft }}>
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 3, paddingHorizontal: small ? 7 : 9, paddingVertical: small ? 2 : 3, borderRadius: 999, backgroundColor: crit === 5 ? t.stopSoft : t.critSoft }}>
       <Icon name="bolt" size={small ? 11 : 13} color={c} fill={c} width={1.2} />
-      <Text style={{ color: c, fontSize: small ? 11 : 12.5, fontWeight: '800', letterSpacing: 0.3 }}>{crit === 5 ? 'JACKPOT ×5' : `CRIT ×${crit}`}</Text>
+      <Text style={{ color: c, fontSize: small ? 12 : 13.5, fontFamily: F.semi }}>{crit === 5 ? 'Jackpot ×5' : `Crit ×${crit}`}</Text>
     </View>
   );
 }
 
 export function TierText({ tier, size = 13 }: { tier: LootTier; size?: number }) {
   const t = useTheme();
-  return <Text style={{ color: tierColor(t, tier), fontSize: size, fontWeight: '800', letterSpacing: 1 }}>{LOOT[tier].label.toUpperCase()}</Text>;
+  return <Text style={{ color: tierColor(t, tier), fontSize: size, fontFamily: F.semi }}>{`${LOOT[tier].label} · ${LOOT[tier].kg} kg plate`}</Text>;
 }
 
 /** A small gold "+120" for points earned. */
 export function PtsText({ n, size = 14, sign = true, color }: { n: number; size?: number; sign?: boolean; color?: string }) {
   const t = useTheme();
-  return <Text style={{ color: color ?? (n < 0 ? t.stop : t.xp), fontSize: size, fontWeight: '800', fontVariant: ['tabular-nums'] }}>{fmtPts(n, sign)}</Text>;
+  return <Text style={numStyle(size * 1.25, color ?? (n < 0 ? t.stop : t.xp))}>{fmtPts(n, sign)}</Text>;
 }

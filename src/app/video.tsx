@@ -7,7 +7,7 @@ import { key } from '../engine/util';
 import { deleteClip, pickClip } from '../services/files';
 import { useApp } from '../store/AppStore';
 import { Button, Field, Row, Txt } from '../ui/components';
-import { useTheme } from '../ui/theme';
+import { F, useTheme } from '../ui/theme';
 
 /** Sheet for adding a how-to video to an exercise. Videos are keyed by exercise name, so they show everywhere it appears. */
 export default function VideoSheet() {
@@ -58,7 +58,7 @@ export default function VideoSheet() {
           <Txt v="fine">Plays right inside Pace. Keep it around 30 seconds.</Txt>
         </>
       ) : null}
-      {msg ? <Txt v="body" style={{ fontWeight: '500' }}>{msg}</Txt> : null}
+      {msg ? <Txt v="body" style={{ fontFamily: F.med }}>{msg}</Txt> : null}
       <Row>
         {current ? <Button kind="dangerLink" title="Remove video" onPress={remove} /> : <View />}
         <Button title="Done" onPress={() => router.back()} />

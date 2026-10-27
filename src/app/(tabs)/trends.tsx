@@ -6,7 +6,7 @@ import { useApp } from '../../store/AppStore';
 import { Card, Grid, Row, Screen, Txt } from '../../ui/components';
 import { fmtPts } from '../../ui/game';
 import { HrvLine, MixBar, RecoveryBars, Sparkline } from '../../ui/charts';
-import { useTheme } from '../../ui/theme';
+import { F, useTheme } from '../../ui/theme';
 
 const Legend = ({ items }: { items: [string, string][] }) => (
   <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 14 }}>
@@ -91,7 +91,7 @@ export default function Trends() {
               <Txt v="fine" style={{ width: 62, textAlign: 'right' }}>{w.tot ? `${Math.round((100 * w.easy) / w.tot)}% easy` : '–'}</Txt>
             </Row>
           ))}
-          <Legend items={[[t.accent, '0–1 left'], [t.steady, '2 left'], [t.easy, '3+ left']]} />
+          <Legend items={[[t.accent, '0–1 in the tank'], [t.steady, '2 in the tank'], [t.easy, '3+ in the tank']]} />
         </> : <Txt v="fine">Log reps left on your sets to see how much of your training is real work.</Txt>}
       </Card>
       <Card>
@@ -104,7 +104,7 @@ export default function Trends() {
           return (
             <Row key={g.name}>
               <View style={{ flex: 1 }}>
-                <Txt v="body" style={{ fontWeight: '500' }}>{g.name}</Txt>
+                <Txt v="body" style={{ fontFamily: F.med }}>{g.name}</Txt>
                 <Txt v="fine">{topStr(last.sets)}{loaded ? ` · e1RM ${Math.round(series[series.length - 1])}` : ''} · <Txt v="fine" color={Math.abs(ch) < 0.5 ? t.ink2 : ch > 0 ? t.go : t.stop}>{Math.abs(ch) < 0.5 ? 'flat' : `${ch > 0 ? '+' : ''}${ch.toFixed(1)}%`}</Txt></Txt>
               </View>
               <Sparkline values={series} />

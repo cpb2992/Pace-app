@@ -3,7 +3,7 @@ import { Linking, TextInput, View } from 'react-native';
 import { testClaudeKey } from '../services/claude';
 import { getClaudeKey, setClaudeKey } from '../services/secrets';
 import { Button, Row, Txt } from './components';
-import { useTheme } from './theme';
+import { F, useTheme } from './theme';
 
 /** Paste, test and save the Claude API key that powers the coach. */
 export function ClaudeKeyForm({ onChange, compact }: { onChange?: (key: string | null) => void; compact?: boolean }) {
@@ -40,12 +40,12 @@ export function ClaudeKeyForm({ onChange, compact }: { onChange?: (key: string |
     <View style={{ gap: 10 }}>
       {compact ? null : <Txt v="fine">Pace’s coach runs on Claude. Make a key at platform.claude.com, paste it here, and it stays in this phone’s secure storage. Each message is one Claude call, billed to your Claude API account.</Txt>}
       <TextInput value={text} onChangeText={setText} placeholder="sk-ant-…" placeholderTextColor={t.ink3} secureTextEntry autoCapitalize="none" autoCorrect={false}
-        accessibilityLabel="Claude API key" style={{ fontSize: 16, color: t.ink, backgroundColor: t.bg, borderColor: t.line, borderWidth: 1, borderRadius: 10, paddingHorizontal: 11, paddingVertical: 10 }} />
+        accessibilityLabel="Claude API key" style={{ fontSize: 16, fontFamily: F.body, color: t.ink, backgroundColor: t.raised, borderRadius: 12, paddingHorizontal: 12, paddingVertical: 12 }} />
       <Row gap={8} style={{ justifyContent: 'flex-start' }}>
         <Button kind="primary" title={busy ? 'Checking…' : 'Save key'} onPress={save} disabled={busy} />
         <Button kind="link" title="Get a key" onPress={() => Linking.openURL('https://platform.claude.com/settings/keys').catch(() => {})} />
       </Row>
-      {msg ? <Txt v="fine" style={{ fontWeight: '500' }}>{msg}</Txt> : null}
+      {msg ? <Txt v="fine" style={{ fontFamily: F.med }}>{msg}</Txt> : null}
     </View>
   );
 }
