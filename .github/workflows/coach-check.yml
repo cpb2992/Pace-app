@@ -19,4 +19,7 @@ jobs:
       - name: Wait for a fresh page publish
         if: github.event_name == 'push'
         run: sleep 60
-      - run: node scripts/check-coach-share.mjs
+      - name: Backend works end to end
+        run: node scripts/check-coach-share.mjs
+      - name: Coach page is live
+        run: curl -fsS https://cpb2992.github.io/Pace-app/coach/ | grep -q "Pace Coach View"
