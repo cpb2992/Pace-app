@@ -9,6 +9,7 @@ import { describeNudge, feelNudges } from '../engine/prompt';
 import type { Feel, LootTier, Nudge } from '../engine/types';
 import { key } from '../engine/util';
 import { useApp } from '../store/AppStore';
+import { useShare } from '../store/ShareStore';
 import { Button, Card, List, Row, Section, Txt } from '../ui/components';
 import { CritPill, fmtPts, PtsText, tierColor, TierText, useCountUp, XpBar } from '../ui/game';
 import { Icon, PlateArt } from '../ui/icons';
@@ -72,6 +73,7 @@ function MysteryPlate({ eligible, loot, quality, pr, onOpen }: { eligible: boole
 export default function Results() {
   const { id, fresh } = useLocalSearchParams<{ id: string; fresh?: string }>();
   const { data, game, today, mutate, demo } = useApp();
+  const { sendWorkout, link } = useShare();
   const t = useTheme();
   const insets = useSafeAreaInsets();
   const session = data.sessions.find(s => s.id === id);
@@ -225,6 +227,8 @@ export default function Results() {
           ) : <Txt v="sub">Too easy moves your lifts up a step next time. Too hard holds them. Something hurt opens the coach.</Txt>}
           {queued ? <Button kind="link" title="Tell the coach more" onPress={() => { router.back(); setTimeout(() => openCoach(`About ${session.day} today: `), 80); }} /> : null}
         </Card>
+        <Button wide title={`Send to ${data.settings.coach || 'your coach'}`} onPress={() => sendWorkout(session.id)} disabled={demo} />
+        {link ? <Txt v="fine" style={{ textAlign: 'center', marginTop: -4 }}>{`${data.settings.coach || 'Your coach'}'s live view already has this workout.`}</Txt> : null}
         <Button kind="primary" wide title="Done" onPress={() => router.back()} />
       </ScrollView>
     </View>

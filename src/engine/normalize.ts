@@ -48,6 +48,7 @@ export function normalizeData(raw: unknown): AppData {
   const s = raw as Record<string, unknown>;
   const settings = { ...base.settings, ...(s.settings as object | undefined) };
   settings.reminder = { ...base.settings.reminder, ...((s.settings as { reminder?: object } | undefined)?.reminder ?? {}) };
+  settings.share = { ...base.settings.share, ...((s.settings as { share?: object } | undefined)?.share ?? {}) };
   return {
     version: 3,
     settings,

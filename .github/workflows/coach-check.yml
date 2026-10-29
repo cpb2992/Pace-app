@@ -1,0 +1,22 @@
+# Checks the live coach view end to end: the pace-share function and the published page.
+name: Check coach view
+
+on:
+  push:
+    branches: [main]
+    paths: ['supabase/functions/pace-share/**', 'scripts/check-coach-share.mjs', '.github/workflows/coach-check.yml', 'site/**']
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Wait for a fresh page publish
+        if: github.event_name == 'push'
+        run: sleep 60
+      - run: node scripts/check-coach-share.mjs

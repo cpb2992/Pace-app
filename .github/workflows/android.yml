@@ -8,7 +8,7 @@ name: Build Android app
 on:
   push:
     branches: [main]
-    paths-ignore: ['**.md', 'LICENSE', '.env.example']
+    paths-ignore: ['**.md', 'LICENSE', '.env.example', 'site/**', 'scripts/**', 'supabase/**', '.github/workflows/pages.yml', '.github/workflows/coach-check.yml']
   workflow_dispatch:
 
 permissions:
@@ -52,6 +52,8 @@ jobs:
         env:
           EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.EXPO_PUBLIC_SUPABASE_URL }}
           EXPO_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.EXPO_PUBLIC_SUPABASE_ANON_KEY }}
+          # Optional: point the coach live view at another Supabase project (defaults to the one in src/services/share.ts).
+          EXPO_PUBLIC_PACE_SHARE_URL: ${{ secrets.EXPO_PUBLIC_PACE_SHARE_URL }}
         run: ./gradlew assembleRelease --no-daemon -PreactNativeArchitectures=arm64-v8a
 
       - name: Name the file

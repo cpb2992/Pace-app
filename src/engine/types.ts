@@ -130,6 +130,17 @@ export interface Settings {
   speak: boolean;
   /** Points, crits, bets and loot. */
   game: boolean;
+  /** What the coach sees through "Send to coach" and the live coach link. */
+  share: ShareSettings;
+}
+
+export interface ShareSettings {
+  /** The athlete's name as the coach sees it. */
+  name: string;
+  /** HRV, sleep, resting heart rate and strain (recovery % is always shared). */
+  recovery: boolean;
+  /** What the athlete told the AI coach to remember. */
+  notes: boolean;
 }
 
 export interface AppData {

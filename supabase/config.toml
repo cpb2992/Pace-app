@@ -7,3 +7,7 @@ verify_jwt = true
 [functions.whoop]
 # WHOOP's browser redirects can't carry a Supabase JWT; the function validates its own state values.
 verify_jwt = false
+
+[functions.pace-share]
+# The phone signs requests with its own secret and the coach page uses the link token, so no Supabase JWT.
+verify_jwt = false

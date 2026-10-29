@@ -6,6 +6,7 @@ import { useEffect } from 'react';
 import { View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AppStoreProvider, useApp } from '../store/AppStore';
+import { ShareProvider } from '../store/ShareStore';
 import { BootSplash } from '../ui/BootSplash';
 import { F, FONT_FILES, useTheme } from '../ui/theme';
 
@@ -40,7 +41,9 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <AppStoreProvider>
-        <Shell fontsReady={fontsLoaded || !!fontError} />
+        <ShareProvider>
+          <Shell fontsReady={fontsLoaded || !!fontError} />
+        </ShareProvider>
       </AppStoreProvider>
     </SafeAreaProvider>
   );

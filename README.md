@@ -13,6 +13,7 @@ Built with Expo (React Native), so one codebase ships to iPhone and Android.
 - **Trends.** Points per week, 30-day recovery and HRV, weekly effort mix, lift trends (estimated max), and strength change by recovery zone.
 - **Program.** Blocks of workouts that switch over on their start date. Edit any workout or exercise and attach a YouTube link or your own clip.
 - **Settings** (gear on Today). WHOOP live sync, WHOOP export import, the Claude key, coach voice, points on/off, theme, morning reminder, pasting a new block, CSV history import, erasing data.
+- **Share with your coach.** "Send to Sarah" on the results screen (and "Send this week" in Settings) opens the share menu with a text summary. The live view gives the coach a private link to a read-only page (`site/coach/`) with workouts, recovery, the coasting check, next workout's targets and the program. It updates on its own; you choose whether HRV/sleep and AI-coach notes are included, can make a new link, or turn it off (which deletes the upload).
 - **Foldables and tablets.** On wide screens, screens switch to two columns and update live when you fold or unfold.
 
 ### Design
@@ -70,6 +71,13 @@ Paste its Client ID and Secret in Settings › WHOOP and tap Connect. Pace then 
 
 **Before selling:** the WHOOP secret and the user's Claude key live on the phone, which is fine for your own use but not for a store app. The `supabase/` folder holds a backend (coach proxy, WHOOP OAuth with server-side tokens) to switch to: create a Supabase project, `supabase db push`, set `ANTHROPIC_API_KEY`, `WHOOP_CLIENT_ID`, `WHOOP_CLIENT_SECRET` and `WHOOP_REDIRECT_URL` as secrets, and deploy the `coach` and `whoop` functions (`--no-verify-jwt` for whoop). Submit the WHOOP app for approval before launch; WHOOP allows 100 requests a minute and 10,000 a day per app.
 
+### Coach live view (already running)
+
+- **Server:** the `pace-share` Edge Function and the `pace_athletes` table, currently in the Supabase project **hats** (Pace shares it to stay on the free plan; tables are prefixed `pace_`). The table has row-level security with no policies, so only the function can touch it; phone keys and coach links are stored as SHA-256 hashes.
+- **Page:** `site/` is published to the `gh-pages` branch by `.github/workflows/pages.yml` and served at https://cpb2992.github.io/Pace-app/coach/. If it ever 404s, turn on GitHub Pages: repo Settings › Pages › Deploy from a branch › `gh-pages` / root.
+- **Check:** `.github/workflows/coach-check.yml` runs `scripts/check-coach-share.mjs` against the live function and page.
+- **Moving Pace to its own Supabase project:** apply `supabase/migrations/20261029000000_pace_coach_share.sql`, deploy `pace-share` with `--no-verify-jwt`, then set `EXPO_PUBLIC_PACE_SHARE_URL` (repo secret for the APK build) and update `API` in `site/coach/index.html`.
+
 ## 3. Publish to the App Store and Google Play
 
 Builds run in the cloud with EAS, so no Xcode or Android Studio is needed.
@@ -106,6 +114,8 @@ src/engine/         training logic with no UI: prescriptions, coasting check, pa
 src/store/          app state and on-device persistence
 src/services/       Claude coach, WHOOP sync, secure storage, speech, file pickers, notifications
 src/ui/             theme, components, charts, boot screen, video tiles
-supabase/           Edge Functions (coach, whoop) and the database migration
+supabase/           Edge Functions (coach, whoop, pace-share) and database migrations
+site/               the coach view page, published to GitHub Pages
+scripts/            live checks
 assets/             icon, adaptive icon, splash
 ```

@@ -20,6 +20,17 @@ export const daysBetween = (a: string, b: string) => Math.round((fromISO(b).getT
 export const weekStart = (iso: string) => addDays(iso, -((fromISO(iso).getDay() + 6) % 7));
 export const dowOf = (iso: string) => fromISO(iso).getDay();
 
+/** "just now", "12 min ago", "3 hr ago", "yesterday", "4 days ago". */
+export function ago(ts: string, now = Date.now()) {
+  const m = Math.round((now - Date.parse(ts)) / 60000);
+  if (!Number.isFinite(m)) return '';
+  if (m < 1) return 'just now';
+  if (m < 60) return `${m} min ago`;
+  const h = Math.round(m / 60);
+  if (h < 24) return `${h} hr ago`;
+  const d = Math.round(h / 24);
+  return d === 1 ? 'yesterday' : `${d} days ago`;
+}
 export const fmtShort = (iso: string) => { const d = fromISO(iso); return `${MON[d.getMonth()]} ${d.getDate()}`; };
 export const fmtMid = (iso: string) => { const d = fromISO(iso); return `${DOW[d.getDay()]}, ${MON[d.getMonth()]} ${d.getDate()}`; };
 export const fmtLong = (iso: string) => { const d = fromISO(iso); return `${DOWL[d.getDay()]}, ${MONL[d.getMonth()]} ${d.getDate()}`; };

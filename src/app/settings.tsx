@@ -9,7 +9,9 @@ import { remindersSupported, setMorningReminder } from '../services/reminders';
 import { getClaudeKey } from '../services/secrets';
 import { connectWhoop, disconnectWhoop, getWhoopClient, setWhoopClient, WHOOP_REDIRECT } from '../services/whoop';
 import { useApp } from '../store/AppStore';
+import { useShare } from '../store/ShareStore';
 import { ClaudeKeyForm } from '../ui/ClaudeKey';
+import { CoachShareCard } from '../ui/CoachShare';
 import { Button, Card, CommitField, Confirm, List, Row, Screen, Section, Segmented, Toggle, TwoCol, Txt } from '../ui/components';
 import { F, useTheme } from '../ui/theme';
 
@@ -89,6 +91,7 @@ function WhoopCard() {
 
 export default function Settings() {
   const { data, mutate, demo, eraseAll, today } = useApp();
+  const share = useShare();
   const t = useTheme();
   const s = data.settings;
   const [whoopMsg, setWhoopMsg] = useState('');
@@ -202,6 +205,9 @@ export default function Settings() {
       </Card>
 
       </>} right={<>
+      <Section>{`Share with ${s.coach || 'your coach'}`}</Section>
+      <CoachShareCard />
+
       <Section>Coach</Section>
       <Card>
         <Txt v="h2">AI coach</Txt>
@@ -259,11 +265,11 @@ export default function Settings() {
         <Txt v="fine">{nDays} days of recovery · {data.sessions.length} sessions · {nWorkouts} workouts · {Object.keys(data.videos).length} videos. Saved on this phone.</Txt>
         <Button kind="link" title="Privacy policy" onPress={() => Linking.openURL(PRIVACY_URL).catch(() => {})} />
         {demo ? null : confirmErase
-          ? <Confirm text="Erase every check-in, import, session, workout, clip, coach chat and point? This can't be undone." confirm="Erase all data" onConfirm={() => { Object.values(data.videos).forEach(v => { if (v.kind === 'clip') deleteClip(v.uri); }); setMorningReminder(false, 0, 0).catch(() => {}); eraseAll(); setConfirmErase(false); }} onCancel={() => setConfirmErase(false)} />
+          ? <Confirm text="Erase every check-in, import, session, workout, clip, coach chat and point? This can't be undone." confirm="Erase all data" onConfirm={() => { Object.values(data.videos).forEach(v => { if (v.kind === 'clip') deleteClip(v.uri); }); setMorningReminder(false, 0, 0).catch(() => {}); if (share.link) share.turnOff(); eraseAll(); setConfirmErase(false); }} onCancel={() => setConfirmErase(false)} />
           : <Button kind="dangerLink" title="Erase all data" onPress={() => setConfirmErase(true)} />}
       </Card>
       </>} />
-      <Txt v="label" style={{ textAlign: 'center', marginTop: 8 }}>Pace 1.2</Txt>
+      <Txt v="label" style={{ textAlign: 'center', marginTop: 8 }}>Pace 1.3</Txt>
     </Screen>
   );
 }

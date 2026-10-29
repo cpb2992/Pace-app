@@ -84,7 +84,7 @@ export const STARTER_PROGRAM = (): Program => {
 
 export const freshData = (): AppData => ({
   version: 3,
-  settings: { tone: 'nofilter', appearance: 'dark', bar: 45, coach: 'Sarah', reminder: { on: false, hour: 7, minute: 0 }, speak: false, game: true },
+  settings: { tone: 'nofilter', appearance: 'dark', bar: 45, coach: 'Sarah', reminder: { on: false, hour: 7, minute: 0 }, speak: false, game: true, share: { name: '', recovery: true, notes: false } },
   program: JSON.parse(JSON.stringify(SARAH_PROGRAM)),
   videos: {},
   whoop: {},
