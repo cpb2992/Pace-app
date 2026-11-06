@@ -7,6 +7,7 @@ Built with Expo (React Native), so one codebase ships to iPhone and Android.
 ## What's in the app
 
 - **Today.** Your rank, points and weekly streak; the recovery ring (WHOOP zones: 67+ recovered, 34–66 moderate, under 34 low), synced from WHOOP; today's workout with a weight target for every exercise; today's bounties; and the coasting check (sets ending with 3+ reps left, stalled lifts, green days spent maintaining).
+- **Minimal equipment.** Can't make the gym? Flip the switch on Today or Train and the day's workout swaps to a pair of dumbbells and bodyweight: same order, sets and reps, with a note on what each swap replaces. Moves that already work at home keep their name and history. It turns itself off the next day.
 - **Train.** A stamped target, last time and plate math for every exercise, a how-to video, set-by-set logging with "in the tank" (reps you had left), live points on every set (crits, PRs, double-or-nothing bets, bounty progress), and a Finish bar pinned above the tabs.
 - **Results.** After each workout: the points breakdown, level progress, a mystery plate to spin, and Too easy / Just right / Too hard / Something hurt feedback that changes your next targets.
 - **Coach.** A chat with an AI coach (type or talk) that reads your WHOOP data, every logged set and the coach's program, remembers what matters (injuries, equipment, preferences), and nudges next session's targets when you give feedback. Optional read-aloud.

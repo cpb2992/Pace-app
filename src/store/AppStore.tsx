@@ -30,6 +30,9 @@ interface Store {
   mutate: (fn: (d: AppData) => void) => void;
   startDemo: () => void;
   endDemo: () => void;
+  /** Minimal-equipment day: today's workout swapped to dumbbells and bodyweight. Resets each day. */
+  minimal: boolean;
+  setMinimal: (on: boolean) => void;
   dayIdx: number | null;
   setDayIdx: (i: number | null) => void;
   draft: Draft | null;
@@ -51,6 +54,9 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
   const [demoData, setDemoData] = useState<AppData | null>(null);
   const [today, setToday] = useState(todayISO());
   const [dayIdx, setDayIdx] = useState<number | null>(null);
+  const [minimalOn, setMinimalOn] = useState<{ date: string; on: boolean }>({ date: '', on: false });
+  const minimal = minimalOn.on && minimalOn.date === today;
+  const setMinimal = useCallback((on: boolean) => setMinimalOn({ date: todayISO(), on }), []);
   const [draft, setDraftState] = useState<Draft | null>(null);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [whoop, setWhoop] = useState<Store['whoop']>({ status: 'no-app', busy: false, msg: '' });
@@ -64,7 +70,7 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
         if (raw) setReal(normalizeData(JSON.parse(raw)));
         if (rawDraft) {
           const d = JSON.parse(rawDraft) as Draft;
-          if (d && d.date === todayISO()) { setDraftState(d); setDayIdx(d.dayIdx); }
+          if (d && d.date === todayISO()) { setDraftState(d); setDayIdx(d.dayIdx); if (d.sig.includes('~min')) setMinimalOn({ date: d.date, on: true }); }
         }
       } catch {
         // Corrupt storage falls back to fresh data rather than blocking launch.
@@ -158,12 +164,12 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const data = demoData ?? real;
-  const ctx = useMemo(() => new Ctx(data, today), [data, today]);
+  const ctx = useMemo(() => new Ctx(data, today, minimal), [data, today, minimal]);
   const game = useMemo(() => summarize(data, today), [data, today]);
 
   const value = useMemo<Store>(() => ({
-    ready, today, demo: !!demoData, data, ctx, game, mutate, startDemo, endDemo, dayIdx, setDayIdx, draft, setDraft, eraseAll, whoop, syncWhoop, refreshWhoop,
-  }), [ready, today, demoData, data, ctx, game, mutate, startDemo, endDemo, dayIdx, draft, setDraft, eraseAll, whoop, syncWhoop, refreshWhoop]);
+    ready, today, demo: !!demoData, data, ctx, game, mutate, startDemo, endDemo, minimal, setMinimal, dayIdx, setDayIdx, draft, setDraft, eraseAll, whoop, syncWhoop, refreshWhoop,
+  }), [ready, today, demoData, data, ctx, game, mutate, startDemo, endDemo, minimal, setMinimal, dayIdx, draft, setDraft, eraseAll, whoop, syncWhoop, refreshWhoop]);
 
   return (
     <StoreContext.Provider value={value}>

@@ -17,6 +17,7 @@ import { addDays, weekStart } from './dates';
 import { setPerf, zoneOf } from './training';
 import type { AppData, Bet, LoggedSet, LootTier, Session, ZoneOrUnknown } from './types';
 import { fmtW, key } from './util';
+import { withMinimal } from './minimal';
 
 export const REP_PTS = 10;
 export const HEAVIER = 1.25;
@@ -250,12 +251,12 @@ type Lookup = (name: string) => { type: string } | undefined;
 
 function lookupFor(data: AppData): Lookup {
   const m = new Map<string, { type: string }>();
-  for (const b of data.program.blocks) for (const d of b.days) for (const e of d.exercises) if (!m.has(key(e.name))) m.set(key(e.name), e);
+  for (const b of data.program.blocks) for (const d of withMinimal(b.days)) for (const e of d.exercises) if (!m.has(key(e.name))) m.set(key(e.name), e);
   return n => m.get(key(n));
 }
 
 function dayExercisesFor(data: AppData, dayName: string, sets: LoggedSet[], look: Lookup) {
-  for (const b of data.program.blocks) for (const d of b.days) if (key(d.name) === key(dayName)) return d.exercises.map(e => ({ name: e.name, type: e.type }));
+  for (const b of data.program.blocks) for (const d of withMinimal(b.days)) if (key(d.name) === key(dayName)) return d.exercises.map(e => ({ name: e.name, type: e.type }));
   const seen = new Set<string>();
   const out: { name: string; type: string }[] = [];
   for (const x of sets) if (!seen.has(key(x.ex))) { seen.add(key(x.ex)); out.push({ name: x.ex, type: look(x.ex)?.type ?? 'machine' }); }
