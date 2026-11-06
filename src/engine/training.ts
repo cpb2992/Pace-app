@@ -1,6 +1,7 @@
 import { addDays, daysBetween, DOWL, fromISO } from './dates';
 import type { AppData, Block, Exercise, ExerciseType, LoggedSet, Session, WorkoutDay, Zone, ZoneOrUnknown } from './types';
 import { avg, fmtW, key } from './util';
+import { baseDayName, minimalDay } from './minimal';
 
 export const zoneOf = (v: number): Zone => (v >= 67 ? 'green' : v >= 34 ? 'yellow' : 'red');
 export const isFree = (t: ExerciseType) => t === 'cardio' || t === 'circuit';
@@ -87,9 +88,13 @@ export class Ctx {
   private _hist = new Map<string, HistEntry[]>();
   private _coast: CoastResult | null = null;
 
-  constructor(data: AppData, today: string) {
+  /** Minimal-equipment mode: every day swapped to dumbbells and bodyweight. */
+  readonly minimal: boolean;
+
+  constructor(data: AppData, today: string, minimal = false) {
     this.data = data;
     this.today = today;
+    this.minimal = minimal;
   }
 
   get sessions(): Session[] {
@@ -121,7 +126,8 @@ export class Ctx {
   }
 
   days(): WorkoutDay[] {
-    return this.activeBlock()?.days ?? [];
+    const days = this.activeBlock()?.days ?? [];
+    return this.minimal ? days.map(minimalDay) : days;
   }
 
   video(name: string) {
@@ -279,11 +285,11 @@ export class Ctx {
     const dow = fromISO(this.today).getDay();
     const ss = this.sessions;
     const todays = ss.filter(s => s.date === this.today).pop();
-    if (todays) { const j = days.findIndex(d => key(d.name) === key(todays.day)); if (j >= 0) return { idx: j, label: 'Today' }; }
+    if (todays) { const j = days.findIndex(d => key(baseDayName(d.name)) === key(baseDayName(todays.day))); if (j >= 0) return { idx: j, label: 'Today' }; }
     const j = days.findIndex(d => d.dow === dow);
     if (j >= 0) return { idx: j, label: 'Today' };
     for (let i = ss.length - 1; i >= 0; i--) {
-      const k = days.findIndex(d => key(d.name) === key(ss[i].day));
+      const k = days.findIndex(d => key(baseDayName(d.name)) === key(baseDayName(ss[i].day)));
       if (k >= 0) { const n = (k + 1) % days.length; return { idx: n, label: days[n].dow != null ? DOWL[days[n].dow!] : 'Up next' }; }
     }
     for (let i = 1; i <= 7; i++) { const dd = (dow + i) % 7; const k = days.findIndex(d => d.dow === dd); if (k >= 0) return { idx: k, label: DOWL[dd] }; }

@@ -1,3 +1,5 @@
+import { baseDayName } from '../../engine/minimal';
+import { MinimalSwitch } from '../../ui/MinimalSwitch';
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
@@ -116,7 +118,8 @@ function UpNext() {
   return (
     <View style={{ gap: 12 }}>
       <Section right={done ? 'Done today' : when === 'Today' ? undefined : when}>{day.name}</Section>
-      {days.length > 1 ? <Segmented options={days.map((d, i) => ({ label: d.name.replace(/^Nov\/Dec\s+/i, ''), value: i }))} value={di} onChange={i => { setDayIdx(i); setDraft(null); }} /> : null}
+      {days.length > 1 ? <Segmented options={days.map((d, i) => ({ label: baseDayName(d.name).replace(/^Nov\/Dec\s+/i, ''), value: i }))} value={di} onChange={i => { setDayIdx(i); setDraft(null); }} /> : null}
+      <MinimalSwitch day={days[di]} />
       <List>
         {day.exercises.map((ex, j) => {
           const p = ctx.prescribe(ex, zone);

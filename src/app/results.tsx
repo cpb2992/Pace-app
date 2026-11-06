@@ -15,6 +15,7 @@ import { CritPill, fmtPts, PtsText, tierColor, TierText, useCountUp, XpBar } fro
 import { Icon, PlateArt } from '../ui/icons';
 import { openCoach } from '../ui/nav';
 import { F, numStyle, radius, useTheme } from '../ui/theme';
+import { withMinimal } from '../engine/minimal';
 
 const FEELS: { v: Feel; label: string }[] = [
   { v: 'easy', label: 'Too easy' },
@@ -87,7 +88,7 @@ export default function Results() {
   const lvlNow = game.level;
   const types = useMemo(() => {
     const m = new Map<string, string>();
-    for (const b of data.program.blocks) for (const d of b.days) for (const e of d.exercises) m.set(key(e.name), e.type);
+    for (const b of data.program.blocks) for (const d of withMinimal(b.days)) for (const e of d.exercises) m.set(key(e.name), e.type);
     return (n: string) => m.get(key(n));
   }, [data.program]);
 

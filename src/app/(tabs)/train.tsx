@@ -1,3 +1,5 @@
+import { baseDayName } from '../../engine/minimal';
+import { MinimalSwitch } from '../../ui/MinimalSwitch';
 import * as Haptics from 'expo-haptics';
 import { router } from 'expo-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -167,6 +169,7 @@ function ExerciseCard({ ex, i, zone, p, draft, setDraft, live, slots, betting }:
       <View style={{ flex: 1, gap: 2 }}>
         <Txt v="h2">{ex.name}</Txt>
         <Txt v="sub">{`${rxText(ex)}${ex.rxSet ? '' : ', sets to confirm'}`}</Txt>
+        {ex.id.endsWith('~min') ? <Txt v="fine">{ex.note}</Txt> : null}
       </View>
       {right}
     </Row>
@@ -374,7 +377,8 @@ export default function Train() {
         </View>
       ) : undefined}
       footer={<Button kind="primary" wide title={data.settings.game && pts ? `Finish workout, ${fmtPts(pts)} points` : 'Finish workout'} onPress={finish} disabled={demo} />}>
-      {days.length > 1 ? <Segmented options={days.map((d, i) => ({ label: d.name.replace(/^Nov\/Dec\s+/i, ''), value: i }))} value={di} onChange={i => { setDayIdx(i); setDraft(null); }} /> : null}
+      {days.length > 1 ? <Segmented options={days.map((d, i) => ({ label: baseDayName(d.name).replace(/^Nov\/Dec\s+/i, ''), value: i }))} value={di} onChange={i => { setDayIdx(i); setDraft(null); }} /> : null}
+      <MinimalSwitch day={days[di]} />
       <Row>
         <Txt v="sub">{cur.date === today ? 'Logging for today' : `Logging for ${fmtLong(cur.date)}`}</Txt>
         <Button kind="link" title={editDate ? 'Done' : 'Change date'} onPress={() => setEditDate(e => !e)} />
